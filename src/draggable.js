@@ -7,7 +7,6 @@ const css = /* css */ `
     position: absolute;
     left: 0;
     top: 0;
-    border: 2px solid rgb(128, 255, 128);
   }
 
   .x-draggable.has-grab-cursor {

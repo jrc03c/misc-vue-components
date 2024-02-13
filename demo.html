@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <style>
+      body {
+        font-family: monospace;
+        font-size: 0.9rem;
+        margin: 3rem;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-content: center;
+        align-items: center;
+      }
+
+      #app {
+        display: none;
+        width: 768px;
+        margin: 0 auto;
+      }
+
+      section {
+        margin: 1rem 0;
+        padding: 1rem 0 0 0;
+        border-top: 2px solid black;
+      }
+
+      .demo {
+        border: 2px solid gray;
+        position: relative;
+        width: 100%;
+        height: 256px;
+        overflow: hidden;
+        background-color: rgb(235, 235, 235);
+        box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .demo::before {
+        position: absolute;
+        left: 0;
+        top: -0;
+        background-color: gray;
+        color: white;
+        content: "Demo";
+        padding: 0.25rem;
+        z-index: 999;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .x-draggable {
+        padding: 1rem;
+        background-color: green;
+        color: white;
+      }
+
+      .x-draggable-floating {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: calc(768px + 6rem)) {
+        body {
+          margin: 1rem;
+        }
+
+        #app {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Miscellaneous Vue Components</h1>
+
+      <section>
+        <h2>Draggable</h2>
+
+        <p>
+          Locked:
+          <input type="checkbox" v-model="draggableIsLocked" />
+        </p>
+
+        <div class="demo">
+          <x-draggable
+            :class="{ 'x-draggable-floating': draggableIsBeingDragged }"
+            :is-locked="draggableIsLocked"
+            :x="draggableX"
+            :y="draggableY"
+            @drag-end="draggableIsBeingDragged = false"
+            @drag-start="draggableIsBeingDragged = true">
+            I'm draggable! Drag me!
+          </x-draggable>
+        </div>
+      </section>
+    </div>
+
+    <script src="node_modules/vue/dist/vue.global.prod.js"></script>
+    <script src="dist/misc-vue-components.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        const app = Vue.createApp({
+          components: {
+            "x-draggable": MiscVueComponents.Draggable,
+            "x-resizeable": MiscVueComponents.Resizeable,
+          },
+
+          data() {
+            return {
+              draggableIsBeingDragged: false,
+              draggableIsLocked: false,
+              draggableX: 32,
+              draggableY: 32,
+            }
+          },
+
+          mounted() {
+            document.querySelector("#app").style.display = "block"
+          },
+        })
+
+        app.mount("#app")
+      })
+    </script>
+  </body>
+</html>
