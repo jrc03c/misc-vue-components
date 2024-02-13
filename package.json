@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@jrc03c/vue-component-with-css": "^0.0.6"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-html": "^8.0.0",
+    "eslint-plugin-vue": "^9.21.1",
+    "prettier": "^3.2.5",
+    "vue": "^3.4.19"
+  },
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/misc-vue-components.js",
+    "watch": "esbuild src/index.js --bundle --outfile=dist/misc-vue-components.js --watch"
+  }
+}
