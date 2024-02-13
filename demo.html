@@ -61,6 +61,17 @@
         transform: translateY(-2px);
       }
 
+      .x-resizeable {
+        padding: 1rem;
+        background-color: blue;
+        color: white;
+        overflow: hidden;
+      }
+
+      .x-resizeable-resizing {
+        background-color: orange;
+      }
+
       @media (max-width: calc(768px + 6rem)) {
         body {
           margin: 1rem;
@@ -96,6 +107,35 @@
           </x-draggable>
         </div>
       </section>
+
+      <section>
+        <h2>Resizeable</h2>
+
+        <p>
+          Drag locked:
+          <input type="checkbox" v-model="resizeableIsDragLocked" />
+        </p>
+
+        <p>
+          Resize locked:
+          <input type="checkbox" v-model="resizeableIsResizeLocked" />
+        </p>
+
+        <div class="demo">
+          <x-resizeable
+            :class="{ 'x-resizeable-resizing': resizeableIsBeingResized }"
+            :is-drag-locked="resizeableIsDragLocked"
+            :is-resize-locked="resizeableIsResizeLocked"
+            :min-height="32"
+            :min-width="32"
+            :x="resizeableX"
+            :y="resizeableY"
+            @resize-end="resizeableIsBeingResized = false"
+            @resize-start="resizeableIsBeingResized = true">
+            I'm resizeable! Resize me!
+          </x-resizeable>
+        </div>
+      </section>
     </div>
 
     <script src="node_modules/vue/dist/vue.global.prod.js"></script>
@@ -114,6 +154,11 @@
               draggableIsLocked: false,
               draggableX: 32,
               draggableY: 32,
+              resizeableIsBeingResized: false,
+              resizeableIsDragLocked: false,
+              resizeableIsResizeLocked: false,
+              resizeableX: 32,
+              resizeableY: 32,
             }
           },
 
