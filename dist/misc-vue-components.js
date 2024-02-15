@@ -173,8 +173,11 @@
           onMouseUp() {
             if (this.isLocked)
               return;
+            const wasBeingDragged = this.isBeingDragged;
             this.isBeingDragged = false;
-            this.$emit("drag-end", this.$el.getBoundingClientRect());
+            if (wasBeingDragged) {
+              this.$emit("drag-end", this.$el.getBoundingClientRect());
+            }
           },
           updateComputedStyle() {
             this.$el.style.left = this.x_ + "px";
@@ -216,8 +219,8 @@
     :is-locked="isDragLocked"
     :x="x_"
     :y="y_"
-    @drag-end="$emit('drag-end', $event)"
-    @drag-move="onDragMove"
+    @drag-end="onDragEnd"
+    @drag-move="$emit('drag-move', $event)"
     @drag-start="$emit('drag-start', $event)"
     class="x-resizeable"
     ref="root">
@@ -321,10 +324,17 @@
           }
         },
         methods: {
-          onDragMove(rect) {
-            this.x_ = rect.x;
-            this.y_ = rect.y;
-            this.$emit("drag-move", rect);
+          onDragEnd(rect) {
+            const parentRect = this.$el.parentElement.getBoundingClientRect();
+            const leftBorderWidth = parseFloat(
+              getComputedStyle(this.$el.parentElement).getPropertyValue("border-left").split("px")[0]
+            );
+            const topBorderWidth = parseFloat(
+              getComputedStyle(this.$el.parentElement).getPropertyValue("border-top").split("px")[0]
+            );
+            this.x_ = rect.x - parentRect.x - leftBorderWidth;
+            this.y_ = rect.y - parentRect.y - topBorderWidth;
+            this.$emit("drag-end", rect);
           },
           onKeyDown(event) {
             if (this.isResizeLocked)
