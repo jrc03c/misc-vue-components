@@ -117,8 +117,12 @@ module.exports = createVueComponentWithCSS({
 
     onMouseUp() {
       if (this.isLocked) return
+      const wasBeingDragged = this.isBeingDragged
       this.isBeingDragged = false
-      this.$emit("drag-end", this.$el.getBoundingClientRect())
+
+      if (wasBeingDragged) {
+        this.$emit("drag-end", this.$el.getBoundingClientRect())
+      }
     },
 
     updateComputedStyle() {
