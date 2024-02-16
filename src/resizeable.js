@@ -44,8 +44,8 @@ module.exports = createVueComponentWithCSS({
     "drag-move",
     "drag-start",
     "resize-end",
-    "resize",
     "resize-start",
+    "resize",
   ],
 
   components: {
@@ -55,7 +55,7 @@ module.exports = createVueComponentWithCSS({
   props: {
     height: {
       type: Number,
-      required: true,
+      required: false,
       default: () => 256,
     },
 
@@ -85,19 +85,19 @@ module.exports = createVueComponentWithCSS({
 
     width: {
       type: Number,
-      required: true,
+      required: false,
       default: () => 256,
     },
 
     x: {
       type: Number,
-      required: true,
+      required: false,
       default: () => 0,
     },
 
     y: {
       type: Number,
-      required: true,
+      required: false,
       default: () => 0,
     },
   },
@@ -213,6 +213,10 @@ module.exports = createVueComponentWithCSS({
       if (shouldCancelEvent) {
         event.preventDefault()
         event.stopPropagation()
+      }
+
+      if (this.isBeingResizedHorizontally || this.isBeingResizedVertically) {
+        this.$emit("resize-start", this.$el.getBoundingClientRect())
       }
     },
 
@@ -367,6 +371,7 @@ module.exports = createVueComponentWithCSS({
         this.updateComputedStyle()
         event.preventDefault()
         event.stopPropagation()
+        this.$emit("resize", this.$el.getBoundingClientRect())
       } else {
         this.isHoveringOverLeftBorder = false
         this.isHoveringOverRightBorder = false
@@ -432,9 +437,17 @@ module.exports = createVueComponentWithCSS({
 
     onMouseUp() {
       if (this.isResizeLocked) return
+
+      const wasBeingResized =
+        this.isBeingResizedHorizontally || this.isBeingResizedVertically
+
       this.isBeingResizedHorizontally = false
       this.isBeingResizedVertically = false
       this.isHoveringOverBorder = false
+
+      if (wasBeingResized) {
+        this.$emit("resize-end", this.$el.getBoundingClientRect())
+      }
     },
 
     updateComputedStyle() {

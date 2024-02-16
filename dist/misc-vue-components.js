@@ -238,8 +238,8 @@
           "drag-move",
           "drag-start",
           "resize-end",
-          "resize",
-          "resize-start"
+          "resize-start",
+          "resize"
         ],
         components: {
           "x-draggable": DraggableComponent
@@ -247,7 +247,7 @@
         props: {
           height: {
             type: Number,
-            required: true,
+            required: false,
             default: () => 256
           },
           "is-drag-locked": {
@@ -272,17 +272,17 @@
           },
           width: {
             type: Number,
-            required: true,
+            required: false,
             default: () => 256
           },
           x: {
             type: Number,
-            required: true,
+            required: false,
             default: () => 0
           },
           y: {
             type: Number,
-            required: true,
+            required: false,
             default: () => 0
           }
         },
@@ -377,6 +377,9 @@
             if (shouldCancelEvent) {
               event.preventDefault();
               event.stopPropagation();
+            }
+            if (this.isBeingResizedHorizontally || this.isBeingResizedVertically) {
+              this.$emit("resize-start", this.$el.getBoundingClientRect());
             }
           },
           onMouseMove(event) {
@@ -512,6 +515,7 @@
               this.updateComputedStyle();
               event.preventDefault();
               event.stopPropagation();
+              this.$emit("resize", this.$el.getBoundingClientRect());
             } else {
               this.isHoveringOverLeftBorder = false;
               this.isHoveringOverRightBorder = false;
@@ -554,9 +558,13 @@
           onMouseUp() {
             if (this.isResizeLocked)
               return;
+            const wasBeingResized = this.isBeingResizedHorizontally || this.isBeingResizedVertically;
             this.isBeingResizedHorizontally = false;
             this.isBeingResizedVertically = false;
             this.isHoveringOverBorder = false;
+            if (wasBeingResized) {
+              this.$emit("resize-end", this.$el.getBoundingClientRect());
+            }
           },
           updateComputedStyle() {
             document.body.style.cursor = "unset";
