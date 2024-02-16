@@ -20,8 +20,8 @@ const template = /* html */ `
     :x="x_"
     :y="y_"
     @drag-end="onDragEnd"
-    @drag-move="$emit('drag-move', $event)"
     @drag-start="$emit('drag-start', $event)"
+    @drag="$emit('drag', $event)"
     class="x-resizeable"
     ref="root">
     <slot></slot>
@@ -41,8 +41,8 @@ module.exports = createVueComponentWithCSS({
 
   emits: [
     "drag-end",
-    "drag-move",
     "drag-start",
+    "drag",
     "resize-end",
     "resize-start",
     "resize",

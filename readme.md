@@ -69,13 +69,13 @@ const MyComponent = {
 
 Is emitted when the user stops dragging the element. (Is emitted when the user releases their mouse button or lifts their touch from the screen, not merely when the element is stationary.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
 
-#### `"drag-move"`
-
-Is emitted when the element is dragged. (Note: Movement must occur for this event to be emitted; i.e., it is not emitted while the element is stationary, even if the user has already initiated a drag.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
-
 #### `drag-start`
 
 Is emitted when a drag is initiated. Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
+
+#### `"drag"`
+
+Is emitted when the element is dragged. (Note: Movement must occur for this event to be emitted; i.e., it is not emitted while the element is stationary, even if the user has already initiated a drag.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
 
 ## `Resizeable`
 
@@ -123,13 +123,13 @@ Same as the `Draggable` `y` prop.
 
 Same as the `Draggable` `"drag-end"` event.
 
-#### `"drag-move"`
-
-Same as the `Draggable` `"drag-move"` event.
-
 #### `"drag-start"`
 
 Same as the `Draggable` `"drag-start"` event.
+
+#### `"drag"`
+
+Same as the `Draggable` `"drag"` event.
 
 #### `"resize-end"`
 

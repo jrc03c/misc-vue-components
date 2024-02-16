@@ -108,7 +108,7 @@
       module.exports = createVueComponentWithCSS({
         name: "x-draggable",
         template,
-        emits: ["drag-end", "drag-move", "drag-start"],
+        emits: ["drag-end", "drag-start", "drag"],
         props: {
           "is-locked": {
             type: Boolean,
@@ -167,7 +167,7 @@
               this.mouse.x = event.screenX;
               this.mouse.y = event.screenY;
               this.updateComputedStyle();
-              this.$emit("drag-move", this.$el.getBoundingClientRect());
+              this.$emit("drag", this.$el.getBoundingClientRect());
             }
           },
           onMouseUp() {
@@ -220,8 +220,8 @@
     :x="x_"
     :y="y_"
     @drag-end="onDragEnd"
-    @drag-move="$emit('drag-move', $event)"
     @drag-start="$emit('drag-start', $event)"
+    @drag="$emit('drag', $event)"
     class="x-resizeable"
     ref="root">
     <slot></slot>
@@ -235,8 +235,8 @@
         template,
         emits: [
           "drag-end",
-          "drag-move",
           "drag-start",
+          "drag",
           "resize-end",
           "resize-start",
           "resize"
