@@ -45,7 +45,7 @@ const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 module.exports = createVueComponentWithCSS({
   name: "x-draggable",
   template,
-  emits: ["drag-end", "drag-move", "drag-start"],
+  emits: ["drag-end", "drag-start", "drag"],
 
   props: {
     "is-locked": {
@@ -111,7 +111,7 @@ module.exports = createVueComponentWithCSS({
         this.mouse.x = event.screenX
         this.mouse.y = event.screenY
         this.updateComputedStyle()
-        this.$emit("drag-move", this.$el.getBoundingClientRect())
+        this.$emit("drag", this.$el.getBoundingClientRect())
       }
     },
 
