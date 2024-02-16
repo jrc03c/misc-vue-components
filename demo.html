@@ -22,10 +22,49 @@
         margin: 0 auto;
       }
 
+      h1 {
+        margin: 1rem 0 2rem 0;
+      }
+
       section {
-        margin: 1rem 0;
+        margin: 1rem 0 2rem 0;
         padding: 1rem 0 0 0;
         border-top: 2px solid black;
+      }
+
+      h2 {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-content: center;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      button.expand-button {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        width: 2rem;
+        height: 2rem;
+        font-size: 1.5rem;
+        background-color: white;
+        color: gray;
+        cursor: pointer;
+        transform: rotate(90deg);
+      }
+
+      button.expand-button:hover {
+        background-color: rgb(245, 245, 245);
+      }
+
+      button.expand-button:active {
+        background-color: rgb(215, 215, 215);
+      }
+
+      button.expand-button.is-expanded {
+        transform: rotate(-90deg);
       }
 
       .demo {
@@ -92,52 +131,74 @@
       <h1>Miscellaneous Vue Components</h1>
 
       <section>
-        <h2>Draggable</h2>
+        <h2>
+          <span>Draggable</span>
 
-        <p>
-          Locked:
-          <input type="checkbox" v-model="draggableIsLocked" />
-        </p>
+          <button
+            :class="{ 'is-expanded': draggableSectionIsExpanded }"
+            @click="draggableSectionIsExpanded = !draggableSectionIsExpanded"
+            class="expand-button">
+            ❯
+          </button>
+        </h2>
 
-        <div class="demo">
-          <x-draggable
-            :class="{ 'x-draggable-floating': draggableIsBeingDragged }"
-            :is-locked="draggableIsLocked"
-            :x="draggableX"
-            :y="draggableY"
-            @drag-end="draggableIsBeingDragged = false"
-            @drag-start="draggableIsBeingDragged = true">
-            I'm draggable! Drag me!
-          </x-draggable>
+        <div v-if="draggableSectionIsExpanded">
+          <p>
+            Locked:
+            <input type="checkbox" v-model="draggableIsLocked" />
+          </p>
+
+          <div class="demo">
+            <x-draggable
+              :class="{ 'x-draggable-floating': draggableIsBeingDragged }"
+              :is-locked="draggableIsLocked"
+              :x="draggableX"
+              :y="draggableY"
+              @drag-end="draggableIsBeingDragged = false"
+              @drag-start="draggableIsBeingDragged = true">
+              I'm draggable! Drag me!
+            </x-draggable>
+          </div>
         </div>
       </section>
 
       <section>
-        <h2>Resizeable</h2>
+        <h2>
+          <span>Resizeable</span>
 
-        <p>
-          Drag locked:
-          <input type="checkbox" v-model="resizeableIsDragLocked" />
-        </p>
+          <button
+            :class="{ 'is-expanded': resizeableSectionIsExpanded }"
+            @click="resizeableSectionIsExpanded = !resizeableSectionIsExpanded"
+            class="expand-button">
+            ❯
+          </button>
+        </h2>
 
-        <p>
-          Resize locked:
-          <input type="checkbox" v-model="resizeableIsResizeLocked" />
-        </p>
+        <div v-if="resizeableSectionIsExpanded">
+          <p>
+            Drag locked:
+            <input type="checkbox" v-model="resizeableIsDragLocked" />
+          </p>
 
-        <div class="demo">
-          <x-resizeable
-            :class="{ 'x-resizeable-resizing': resizeableIsBeingResized }"
-            :is-drag-locked="resizeableIsDragLocked"
-            :is-resize-locked="resizeableIsResizeLocked"
-            :min-height="32"
-            :min-width="32"
-            :x="resizeableX"
-            :y="resizeableY"
-            @resize-end="resizeableIsBeingResized = false"
-            @resize-start="resizeableIsBeingResized = true">
-            I'm resizeable! Resize me!
-          </x-resizeable>
+          <p>
+            Resize locked:
+            <input type="checkbox" v-model="resizeableIsResizeLocked" />
+          </p>
+
+          <div class="demo">
+            <x-resizeable
+              :class="{ 'x-resizeable-resizing': resizeableIsBeingResized }"
+              :is-drag-locked="resizeableIsDragLocked"
+              :is-resize-locked="resizeableIsResizeLocked"
+              :min-height="32"
+              :min-width="32"
+              :x="resizeableX"
+              :y="resizeableY"
+              @resize-end="resizeableIsBeingResized = false"
+              @resize-start="resizeableIsBeingResized = true">
+              I'm resizeable! Resize me!
+            </x-resizeable>
+          </div>
         </div>
       </section>
     </div>
@@ -156,11 +217,13 @@
             return {
               draggableIsBeingDragged: false,
               draggableIsLocked: false,
+              draggableSectionIsExpanded: false,
               draggableX: 32,
               draggableY: 32,
               resizeableIsBeingResized: false,
               resizeableIsDragLocked: false,
               resizeableIsResizeLocked: false,
+              resizeableSectionIsExpanded: false,
               resizeableX: 32,
               resizeableY: 32,
             }
