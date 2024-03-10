@@ -1,5 +1,6 @@
 const MiscVueComponents = {
   Draggable: require("./draggable"),
+  Frame: require("./frame"),
   Resizeable: require("./resizeable"),
 }
 

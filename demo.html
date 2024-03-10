@@ -131,6 +131,45 @@
 
       <section>
         <h2>
+          <span>Frame</span>
+
+          <button
+            :class="{ 'is-expanded': frameSectionIsExpanded }"
+            @click="frameSectionIsExpanded = !frameSectionIsExpanded"
+            class="expand-button">
+            ❯
+          </button>
+        </h2>
+
+        <div v-if="frameSectionIsExpanded">
+          <p>
+            Locked:
+            <input type="checkbox" v-model="frameIsLocked" />
+          </p>
+
+          <p>
+            <button @click="extraFrameCount++">Add another frame</button>
+          </p>
+
+          <div class="demo">
+            <x-frame
+              :class="{ 'x-frame-resizing': frameIsBeingResized }"
+              :is-locked="frameIsLocked"
+              @resize-end="frameIsBeingResized = false"
+              @resize-start="frameIsBeingResized = true">
+              <div>I'm one pane in a frame.</div>
+              <div>I'm another pane in a frame.</div>
+
+              <div v-for="i in range(0, extraFrameCount)">
+                Here's another frame!
+              </div>
+            </x-frame>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>
           <span>Draggable</span>
 
           <button
@@ -239,6 +278,7 @@
         const app = Vue.createApp({
           components: {
             "x-draggable": MiscVueComponents.Draggable,
+            "x-frame": MiscVueComponents.Frame,
             "x-resizeable": MiscVueComponents.Resizeable,
           },
 
@@ -250,6 +290,10 @@
               draggableSectionIsExpanded: true,
               draggableX: 32,
               draggableY: 32,
+              extraFrameCount: 0,
+              frameIsBeingResized: false,
+              frameIsLocked: false,
+              frameSectionIsExpanded: true,
               resizeableIsBeingResized: false,
               resizeableIsHorizontalDragLocked: false,
               resizeableIsResizeLockedBottom: false,
@@ -261,6 +305,18 @@
               resizeableX: 32,
               resizeableY: 32,
             }
+          },
+
+          methods: {
+            range(a, b) {
+              const out = []
+
+              for (let i = a; i < b; i++) {
+                out.push(i)
+              }
+
+              return out
+            },
           },
 
           mounted() {
