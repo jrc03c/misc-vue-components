@@ -97,7 +97,7 @@
         /* html */
         `
   <div
-    :class="{ 'has-grab-cursor': !isLocked }"
+    :class="{ 'has-grab-cursor': !isHorizontallyLocked || !isVerticallyLocked }"
     @mousedown="onMouseDown"
     class="x-draggable">
     <slot></slot>
@@ -110,7 +110,12 @@
         template,
         emits: ["drag-end", "drag-start", "drag"],
         props: {
-          "is-locked": {
+          "is-horizontally-locked": {
+            type: Boolean,
+            required: false,
+            default: () => false
+          },
+          "is-vertically-locked": {
             type: Boolean,
             required: false,
             default: () => false
@@ -149,45 +154,60 @@
           onMouseDown(event) {
             event.preventDefault();
             event.stopPropagation();
-            if (this.isLocked)
+            if (this.isHorizontallyLocked && this.isVerticallyLocked) {
               return;
-            this.mouse.x = event.screenX;
-            this.mouse.y = event.screenY;
+            }
+            if (!this.isHorizontallyLocked) {
+              this.mouse.x = event.screenX;
+            }
+            if (!this.isVerticallyLocked) {
+              this.mouse.y = event.screenY;
+            }
             this.isBeingDragged = true;
             this.$emit("drag-start", this.$el.getBoundingClientRect());
           },
           onMouseMove(event) {
-            if (this.isLocked)
+            if (this.isHorizontallyLocked && this.isVerticallyLocked) {
               return;
+            }
             if (this.isBeingDragged) {
               const dx = event.screenX - this.mouse.x;
               const dy = event.screenY - this.mouse.y;
-              this.x_ += dx;
-              this.y_ += dy;
-              this.mouse.x = event.screenX;
-              this.mouse.y = event.screenY;
+              if (!this.isHorizontallyLocked) {
+                this.x_ += dx;
+                this.mouse.x = event.screenX;
+              }
+              if (!this.isVerticallyLocked) {
+                this.y_ += dy;
+                this.mouse.y = event.screenY;
+              }
               this.updateComputedStyle();
               this.$emit("drag", this.$el.getBoundingClientRect());
             }
           },
           onMouseUp() {
-            if (this.isLocked)
+            if (this.isHorizontallyLocked && this.isVerticallyLocked) {
               return;
+            }
             const wasBeingDragged = this.isBeingDragged;
             this.isBeingDragged = false;
             if (wasBeingDragged) {
               this.$emit("drag-end", this.$el.getBoundingClientRect());
             }
           },
-          updateComputedStyle() {
-            this.$el.style.left = this.x_ + "px";
-            this.$el.style.top = this.y_ + "px";
+          updateComputedStyle(shouldForceUpdate) {
+            if (shouldForceUpdate || !this.isHorizontallyLocked) {
+              this.$el.style.left = this.x_ + "px";
+            }
+            if (shouldForceUpdate || !this.isVerticallyLocked) {
+              this.$el.style.top = this.y_ + "px";
+            }
           }
         },
         mounted() {
           this.x_ = this.x;
           this.y_ = this.y;
-          this.updateComputedStyle();
+          this.updateComputedStyle(true);
           window.addEventListener("mousemove", this.onMouseMove);
           window.addEventListener("mouseup", this.onMouseUp);
         },
@@ -216,7 +236,8 @@
         `
   <x-draggable
     :class="{ 'no-pointer-events': shouldPreventInternalPointerEvents }"
-    :is-locked="isDragLocked"
+    :is-horizontally-locked="isHorizontalDragLocked"
+    :is-vertically-locked="isVerticalDragLocked"
     :x="x_"
     :y="y_"
     @drag-end="onDragEnd"
@@ -250,12 +271,32 @@
             required: false,
             default: () => 256
           },
-          "is-drag-locked": {
+          "is-horizontal-drag-locked": {
             type: Boolean,
             required: false,
             default: () => false
           },
-          "is-resize-locked": {
+          "is-resize-locked-bottom": {
+            type: Boolean,
+            required: false,
+            default: () => false
+          },
+          "is-resize-locked-left": {
+            type: Boolean,
+            required: false,
+            default: () => false
+          },
+          "is-resize-locked-right": {
+            type: Boolean,
+            required: false,
+            default: () => false
+          },
+          "is-resize-locked-top": {
+            type: Boolean,
+            required: false,
+            default: () => false
+          },
+          "is-vertical-drag-locked": {
             type: Boolean,
             required: false,
             default: () => false
@@ -307,6 +348,11 @@
             y_: 0
           };
         },
+        computed: {
+          isCompletelyLocked() {
+            return this.isResizeLockedLeft && this.isResizeLockedRight && this.isResizeLockedTop && this.isResizeLockedBottom;
+          }
+        },
         watch: {
           height() {
             this.height_ = this.height;
@@ -337,39 +383,42 @@
             this.$emit("drag-end", rect);
           },
           onKeyDown(event) {
-            if (this.isResizeLocked)
+            if (this.isCompletelyLocked) {
               return;
+            }
             if (event.key === "Shift") {
               this.shouldScaleProportionally = true;
             }
           },
           onKeyUp(event) {
-            if (this.isResizeLocked)
+            if (this.isCompletelyLocked) {
               return;
+            }
             if (event.key === "Shift") {
               this.shouldScaleProportionally = false;
             }
           },
           onMouseDown(event) {
-            if (this.isResizeLocked)
+            if (this.isCompletelyLocked) {
               return;
+            }
             let shouldCancelEvent = false;
-            if (this.isHoveringOverLeftBorder) {
+            if (this.isHoveringOverLeftBorder && !this.isResizeLockedLeft) {
               this.isBeingResizedHorizontally = true;
               this.anchoredLeftRightBorder = "right";
               shouldCancelEvent = true;
             }
-            if (this.isHoveringOverRightBorder) {
+            if (this.isHoveringOverRightBorder && !this.isResizeLockedRight) {
               this.isBeingResizedHorizontally = true;
               this.anchoredLeftRightBorder = "left";
               shouldCancelEvent = true;
             }
-            if (this.isHoveringOverTopBorder) {
+            if (this.isHoveringOverTopBorder && !this.isResizeLockedTop) {
               this.isBeingResizedVertically = true;
               this.anchoredTopBottomBorder = "bottom";
               shouldCancelEvent = true;
             }
-            if (this.isHoveringOverBottomBorder) {
+            if (this.isHoveringOverBottomBorder && !this.isResizeLockedBottom) {
               this.isBeingResizedVertically = true;
               this.anchoredTopBottomBorder = "top";
               shouldCancelEvent = true;
@@ -383,8 +432,9 @@
             }
           },
           onMouseMove(event) {
-            if (this.isResizeLocked)
+            if (this.isCompletelyLocked) {
               return;
+            }
             if (this.isBeingResizedHorizontally || this.isBeingResizedVertically) {
               const aspect = this.width_ / this.height_;
               let mx = event.movementX;
@@ -556,8 +606,9 @@
             }
           },
           onMouseUp() {
-            if (this.isResizeLocked)
+            if (this.isCompletelyLocked) {
               return;
+            }
             const wasBeingResized = this.isBeingResizedHorizontally || this.isBeingResizedVertically;
             this.isBeingResizedHorizontally = false;
             this.isBeingResizedVertically = false;
@@ -567,23 +618,27 @@
             }
           },
           updateComputedStyle() {
+            const shouldResizeLeft = this.isHoveringOverLeftBorder && !this.isResizeLockedLeft;
+            const shouldResizeRight = this.isHoveringOverRightBorder && !this.isResizeLockedRight;
+            const shouldResizeTop = this.isHoveringOverTopBorder && !this.isResizeLockedTop;
+            const shouldResizeBottom = this.isHoveringOverBottomBorder && !this.isResizeLockedBottom;
             document.body.style.cursor = "unset";
-            if (this.isHoveringOverLeftBorder || this.isHoveringOverRightBorder) {
+            if (shouldResizeLeft || shouldResizeRight) {
               document.body.style.cursor = "ew-resize";
             }
-            if (this.isHoveringOverTopBorder || this.isHoveringOverBottomBorder) {
+            if (shouldResizeTop || shouldResizeBottom) {
               document.body.style.cursor = "ns-resize";
             }
-            if (this.isHoveringOverLeftBorder && this.isHoveringOverTopBorder) {
+            if (shouldResizeLeft && shouldResizeTop) {
               document.body.style.cursor = "nwse-resize";
             }
-            if (this.isHoveringOverLeftBorder && this.isHoveringOverBottomBorder) {
+            if (shouldResizeLeft && shouldResizeBottom) {
               document.body.style.cursor = "nesw-resize";
             }
-            if (this.isHoveringOverRightBorder && this.isHoveringOverTopBorder) {
+            if (shouldResizeRight && shouldResizeTop) {
               document.body.style.cursor = "nesw-resize";
             }
-            if (this.isHoveringOverRightBorder && this.isHoveringOverBottomBorder) {
+            if (shouldResizeRight && shouldResizeBottom) {
               document.body.style.cursor = "nwse-resize";
             }
             this.$el.style.width = this.width_ + "px";

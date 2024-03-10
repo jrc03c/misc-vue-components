@@ -16,7 +16,8 @@ const css = /* css */ `
 const template = /* html */ `
   <x-draggable
     :class="{ 'no-pointer-events': shouldPreventInternalPointerEvents }"
-    :is-locked="isDragLocked"
+    :is-horizontally-locked="isHorizontalDragLocked"
+    :is-vertically-locked="isVerticalDragLocked"
     :x="x_"
     :y="y_"
     @drag-end="onDragEnd"
@@ -59,13 +60,37 @@ module.exports = createVueComponentWithCSS({
       default: () => 256,
     },
 
-    "is-drag-locked": {
+    "is-horizontal-drag-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-resize-locked": {
+    "is-resize-locked-bottom": {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+
+    "is-resize-locked-left": {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+
+    "is-resize-locked-right": {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+
+    "is-resize-locked-top": {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+
+    "is-vertical-drag-locked": {
       type: Boolean,
       required: false,
       default: () => false,
@@ -124,6 +149,17 @@ module.exports = createVueComponentWithCSS({
     }
   },
 
+  computed: {
+    isCompletelyLocked() {
+      return (
+        this.isResizeLockedLeft &&
+        this.isResizeLockedRight &&
+        this.isResizeLockedTop &&
+        this.isResizeLockedBottom
+      )
+    },
+  },
+
   watch: {
     height() {
       this.height_ = this.height
@@ -166,7 +202,9 @@ module.exports = createVueComponentWithCSS({
     },
 
     onKeyDown(event) {
-      if (this.isResizeLocked) return
+      if (this.isCompletelyLocked) {
+        return
+      }
 
       if (event.key === "Shift") {
         this.shouldScaleProportionally = true
@@ -174,7 +212,9 @@ module.exports = createVueComponentWithCSS({
     },
 
     onKeyUp(event) {
-      if (this.isResizeLocked) return
+      if (this.isCompletelyLocked) {
+        return
+      }
 
       if (event.key === "Shift") {
         this.shouldScaleProportionally = false
@@ -182,29 +222,31 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseDown(event) {
-      if (this.isResizeLocked) return
+      if (this.isCompletelyLocked) {
+        return
+      }
 
       let shouldCancelEvent = false
 
-      if (this.isHoveringOverLeftBorder) {
+      if (this.isHoveringOverLeftBorder && !this.isResizeLockedLeft) {
         this.isBeingResizedHorizontally = true
         this.anchoredLeftRightBorder = "right"
         shouldCancelEvent = true
       }
 
-      if (this.isHoveringOverRightBorder) {
+      if (this.isHoveringOverRightBorder && !this.isResizeLockedRight) {
         this.isBeingResizedHorizontally = true
         this.anchoredLeftRightBorder = "left"
         shouldCancelEvent = true
       }
 
-      if (this.isHoveringOverTopBorder) {
+      if (this.isHoveringOverTopBorder && !this.isResizeLockedTop) {
         this.isBeingResizedVertically = true
         this.anchoredTopBottomBorder = "bottom"
         shouldCancelEvent = true
       }
 
-      if (this.isHoveringOverBottomBorder) {
+      if (this.isHoveringOverBottomBorder && !this.isResizeLockedBottom) {
         this.isBeingResizedVertically = true
         this.anchoredTopBottomBorder = "top"
         shouldCancelEvent = true
@@ -221,7 +263,9 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseMove(event) {
-      if (this.isResizeLocked) return
+      if (this.isCompletelyLocked) {
+        return
+      }
 
       if (this.isBeingResizedHorizontally || this.isBeingResizedVertically) {
         const aspect = this.width_ / this.height_
@@ -436,7 +480,9 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseUp() {
-      if (this.isResizeLocked) return
+      if (this.isCompletelyLocked) {
+        return
+      }
 
       const wasBeingResized =
         this.isBeingResizedHorizontally || this.isBeingResizedVertically
@@ -451,29 +497,41 @@ module.exports = createVueComponentWithCSS({
     },
 
     updateComputedStyle() {
+      const shouldResizeLeft =
+        this.isHoveringOverLeftBorder && !this.isResizeLockedLeft
+
+      const shouldResizeRight =
+        this.isHoveringOverRightBorder && !this.isResizeLockedRight
+
+      const shouldResizeTop =
+        this.isHoveringOverTopBorder && !this.isResizeLockedTop
+
+      const shouldResizeBottom =
+        this.isHoveringOverBottomBorder && !this.isResizeLockedBottom
+
       document.body.style.cursor = "unset"
 
-      if (this.isHoveringOverLeftBorder || this.isHoveringOverRightBorder) {
+      if (shouldResizeLeft || shouldResizeRight) {
         document.body.style.cursor = "ew-resize"
       }
 
-      if (this.isHoveringOverTopBorder || this.isHoveringOverBottomBorder) {
+      if (shouldResizeTop || shouldResizeBottom) {
         document.body.style.cursor = "ns-resize"
       }
 
-      if (this.isHoveringOverLeftBorder && this.isHoveringOverTopBorder) {
+      if (shouldResizeLeft && shouldResizeTop) {
         document.body.style.cursor = "nwse-resize"
       }
 
-      if (this.isHoveringOverLeftBorder && this.isHoveringOverBottomBorder) {
+      if (shouldResizeLeft && shouldResizeBottom) {
         document.body.style.cursor = "nesw-resize"
       }
 
-      if (this.isHoveringOverRightBorder && this.isHoveringOverTopBorder) {
+      if (shouldResizeRight && shouldResizeTop) {
         document.body.style.cursor = "nesw-resize"
       }
 
-      if (this.isHoveringOverRightBorder && this.isHoveringOverBottomBorder) {
+      if (shouldResizeRight && shouldResizeBottom) {
         document.body.style.cursor = "nwse-resize"
       }
 
