@@ -29,7 +29,7 @@ const css = /* css */ `
 
 const template = /* html */ `
   <div
-    :class="{ 'has-grab-cursor': !isLocked }"
+    :class="{ 'has-grab-cursor': !isHorizontallyLocked || !isVerticallyLocked }"
     @mousedown="onMouseDown"
     class="x-draggable">
     <slot></slot>
@@ -48,7 +48,13 @@ module.exports = createVueComponentWithCSS({
   emits: ["drag-end", "drag-start", "drag"],
 
   props: {
-    "is-locked": {
+    "is-horizontally-locked": {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+
+    "is-vertically-locked": {
       type: Boolean,
       required: false,
       default: () => false,
@@ -93,30 +99,52 @@ module.exports = createVueComponentWithCSS({
     onMouseDown(event) {
       event.preventDefault()
       event.stopPropagation()
-      if (this.isLocked) return
-      this.mouse.x = event.screenX
-      this.mouse.y = event.screenY
+
+      if (this.isHorizontallyLocked && this.isVerticallyLocked) {
+        return
+      }
+
+      if (!this.isHorizontallyLocked) {
+        this.mouse.x = event.screenX
+      }
+
+      if (!this.isVerticallyLocked) {
+        this.mouse.y = event.screenY
+      }
+
       this.isBeingDragged = true
       this.$emit("drag-start", this.$el.getBoundingClientRect())
     },
 
     onMouseMove(event) {
-      if (this.isLocked) return
+      if (this.isHorizontallyLocked && this.isVerticallyLocked) {
+        return
+      }
 
       if (this.isBeingDragged) {
         const dx = event.screenX - this.mouse.x
         const dy = event.screenY - this.mouse.y
-        this.x_ += dx
-        this.y_ += dy
-        this.mouse.x = event.screenX
-        this.mouse.y = event.screenY
+
+        if (!this.isHorizontallyLocked) {
+          this.x_ += dx
+          this.mouse.x = event.screenX
+        }
+
+        if (!this.isVerticallyLocked) {
+          this.y_ += dy
+          this.mouse.y = event.screenY
+        }
+
         this.updateComputedStyle()
         this.$emit("drag", this.$el.getBoundingClientRect())
       }
     },
 
     onMouseUp() {
-      if (this.isLocked) return
+      if (this.isHorizontallyLocked && this.isVerticallyLocked) {
+        return
+      }
+
       const wasBeingDragged = this.isBeingDragged
       this.isBeingDragged = false
 
@@ -125,16 +153,21 @@ module.exports = createVueComponentWithCSS({
       }
     },
 
-    updateComputedStyle() {
-      this.$el.style.left = this.x_ + "px"
-      this.$el.style.top = this.y_ + "px"
+    updateComputedStyle(shouldForceUpdate) {
+      if (shouldForceUpdate || !this.isHorizontallyLocked) {
+        this.$el.style.left = this.x_ + "px"
+      }
+
+      if (shouldForceUpdate || !this.isVerticallyLocked) {
+        this.$el.style.top = this.y_ + "px"
+      }
     },
   },
 
   mounted() {
     this.x_ = this.x
     this.y_ = this.y
-    this.updateComputedStyle()
+    this.updateComputedStyle(true)
     window.addEventListener("mousemove", this.onMouseMove)
     window.addEventListener("mouseup", this.onMouseUp)
   },
