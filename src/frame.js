@@ -75,6 +75,10 @@ const css = /* css */ `
     height: 2px;
     margin: auto 0;
   }
+
+  .x-frame.is-locked .x-frame-divider {
+    cursor: unset;
+  }
 `
 
 // -----------------------------------------------------------------------------
@@ -85,6 +89,7 @@ const template = /* html */ `
   <div
     :class="{
       'is-being-resized': isBeingResized,
+      'is-locked': isLocked,
       'x-frame-horizontal': orientation === 'horizontal',
       'x-frame-vertical': orientation === 'vertical'
     }"
@@ -153,13 +158,14 @@ module.exports = createVueComponentWithCSS({
 
   methods: {
     onMouseDown(event, dividerIndex) {
+      if (this.isLocked) return
       this.isBeingResized = true
       this.activeDividerIndex = dividerIndex
       this.$emit("resize-start")
     },
 
     onMouseMove(event) {
-      if (this.isBeingResized) {
+      if (!this.isLocked && this.isBeingResized) {
         if (this.orientation === "horizontal") {
           const dx = event.pageX - this.mouse.x
 
@@ -219,10 +225,14 @@ module.exports = createVueComponentWithCSS({
 
       this.mouse.x = event.pageX
       this.mouse.y = event.pageY
-      this.$emit("resize")
+
+      if (!this.isLocked) {
+        this.$emit("resize")
+      }
     },
 
     onMouseUp() {
+      if (this.isLocked) return
       const wasBeingResized = this.isBeingResized
       this.isBeingResized = false
 
