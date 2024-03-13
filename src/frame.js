@@ -99,18 +99,10 @@ const template = /* html */ `
 
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 
-function clamp(x, a, b) {
-  return x < a ? a : x > b ? b : x
-}
-
 function sum(x) {
   let s = 0
   x.forEach(v => (s += v))
   return s
-}
-
-function remap(x, a, b, c, d) {
-  return ((d - c) * (x - a)) / (b - a) + c
 }
 
 module.exports = createVueComponentWithCSS({
