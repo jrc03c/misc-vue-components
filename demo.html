@@ -147,10 +147,6 @@
             <input type="checkbox" v-model="frameIsLocked" />
           </p>
 
-          <p>
-            <button @click="extraFrameCount++">Add another frame</button>
-          </p>
-
           <div class="demo">
             <x-frame
               :class="{ 'x-frame-resizing': frameIsBeingResized }"
@@ -159,10 +155,7 @@
               @resize-start="frameIsBeingResized = true">
               <div>I'm one pane in a frame.</div>
               <div>I'm another pane in a frame.</div>
-
-              <div v-for="i in range(0, extraFrameCount)">
-                Here's another frame!
-              </div>
+              <div>Here's another pane!</div>
             </x-frame>
           </div>
         </div>
@@ -290,7 +283,6 @@
               draggableSectionIsExpanded: true,
               draggableX: 32,
               draggableY: 32,
-              extraFrameCount: 0,
               frameIsBeingResized: false,
               frameIsLocked: false,
               frameSectionIsExpanded: true,

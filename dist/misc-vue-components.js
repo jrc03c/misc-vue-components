@@ -235,30 +235,38 @@
     gap: 0;
   }
 
-  .x-frame .user-select-none,
-  .x-frame .user-select-none * {
+  .x-frame.is-being-resized,
+  .x-frame.is-being-resized * {
     user-select: none !important;
   }
 
   .x-frame-horizontal {
     flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
-  .x-frame-horizontal > * {
+  .x-frame-horizontal > *:not(.x-frame-divider) {
     overflow-x: hidden;
+    width: 100%;
+    flex-shrink: 999999;
   }
 
   .x-frame-vertical {
     flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .x-frame-vertical > * {
+  .x-frame-vertical > *:not(.x-frame-divider) {
     overflow-y: hidden;
+    width: 100%;
+    flex-shrink: 999999;
   }
 
   .x-frame-horizontal .x-frame-divider {
     cursor: col-resize;
-    width: 2px;
+    width: 16px;
     height: 100%;
     background-color: red;
   }
@@ -266,7 +274,7 @@
   .x-frame-vertical .x-frame-divider {
     cursor: row-resize;
     width: 100%;
-    height: 2px;
+    height: 16px;
     background-color: red;
   }
 `
@@ -276,7 +284,7 @@
         `
   <div
     :class="{
-      'user-select-none': isBeingResized,
+      'is-being-resized': isBeingResized,
       'x-frame-horizontal': orientation === 'horizontal',
       'x-frame-vertical': orientation === 'vertical'
     }"
@@ -286,6 +294,14 @@
 `
       );
       var createVueComponentWithCSS = require_src();
+      function clamp(x, a, b) {
+        return x < a ? a : x > b ? b : x;
+      }
+      function sum(x) {
+        let s = 0;
+        x.forEach((v) => s += v);
+        return s;
+      }
       module.exports = createVueComponentWithCSS({
         name: "x-frame",
         template,
@@ -295,6 +311,16 @@
             type: Boolean,
             required: false,
             default: () => false
+          },
+          "max-width": {
+            type: Number,
+            required: false,
+            default: () => Infinity
+          },
+          "min-width": {
+            type: Number,
+            required: false,
+            default: () => 64
           },
           orientation: {
             type: String,
@@ -312,34 +338,43 @@
               x: 0,
               y: 0
             },
-            observer: null
+            observer: null,
+            widths: []
           };
         },
         methods: {
           onMouseDown(event, dividerIndex) {
             this.isBeingResized = true;
             this.activeDividerIndex = dividerIndex;
-            this.mouse.x = event.pageX;
-            this.mouse.y = event.pageY;
             this.$emit("resize-start");
           },
           onMouseMove(event) {
-            if (!this.isBeingResized)
-              return;
-            if (this.orientation === "horizontal") {
-              const dx = event.pageX - this.mouse.x;
-              const children = Array.from(this.$el.children).filter(
-                (child) => !child.classList.contains("x-frame-divider")
-              );
-              const child1 = children[this.activeDividerIndex];
-              const child2 = children[this.activeDividerIndex + 1];
-              const child1Rect = child1.getBoundingClientRect();
-              const child2Rect = child2.getBoundingClientRect();
-              child1.style.width = `${child1Rect.width + dx}px`;
-              child2.style.width = `${child2Rect.width - dx}px`;
-              this.mouse.x = event.pageX;
-            } else {
+            if (this.isBeingResized) {
+              if (this.orientation === "horizontal") {
+                const dx = event.pageX - this.mouse.x;
+                const children = Array.from(this.$el.children).filter(
+                  (child) => !child.classList.contains("x-frame-divider")
+                );
+                const child1 = children[this.activeDividerIndex];
+                const child2 = children[this.activeDividerIndex + 1];
+                const child1Rect = child1.getBoundingClientRect();
+                const child2Rect = child2.getBoundingClientRect();
+                this.widths[this.activeDividerIndex] = clamp(
+                  child1Rect.width + dx,
+                  this.minWidth,
+                  this.maxWidth
+                );
+                this.widths[this.activeDividerIndex + 1] = clamp(
+                  child2Rect.width - dx,
+                  this.minWidth,
+                  this.maxWidth
+                );
+                this.updateStyles();
+              } else {
+              }
             }
+            this.mouse.x = event.pageX;
+            this.mouse.y = event.pageY;
             this.$emit("resize");
           },
           onMouseUp() {
@@ -367,7 +402,24 @@
               });
             });
             this.$nextTick(() => {
+              this.updateStyles();
               this.isAddingDividers = false;
+            });
+          },
+          updateStyles() {
+            const parentRect = this.$el.getBoundingClientRect();
+            const dividers = [];
+            const nonDividers = [];
+            Array.from(this.$el.children).forEach((child) => {
+              if (child.classList.contains("x-frame-divider")) {
+                dividers.push(child);
+              } else {
+                nonDividers.push(child);
+              }
+            });
+            const parentWidth = parentRect.width - sum(dividers.map((d) => d.getBoundingClientRect().width));
+            nonDividers.forEach((child, i) => {
+              child.style.width = `${this.widths[i] || parentWidth / nonDividers.length}px`;
             });
           }
         },
