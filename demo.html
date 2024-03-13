@@ -89,6 +89,13 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       }
 
+      .x-frame > *:not(.x-frame-divider) {
+        margin: 1rem;
+        padding: 1rem;
+        background-color: purple;
+        color: white;
+      }
+
       .x-draggable {
         padding: 1rem;
         background-color: green;
@@ -151,6 +158,7 @@
             <x-frame
               :class="{ 'x-frame-resizing': frameIsBeingResized }"
               :is-locked="frameIsLocked"
+              :start-sizes="[0.15, 0.7, 0.15]"
               @resize-end="frameIsBeingResized = false"
               @resize-start="frameIsBeingResized = true">
               <div>I'm one pane in a frame.</div>
