@@ -158,12 +158,11 @@
             <x-frame
               :class="{ 'x-frame-resizing': frameIsBeingResized }"
               :is-locked="frameIsLocked"
-              :start-sizes="[0.15, 0.7, 0.15]"
               @resize-end="frameIsBeingResized = false"
               @resize-start="frameIsBeingResized = true">
-              <div>I'm one pane in a frame.</div>
-              <div>I'm another pane in a frame.</div>
-              <div>Here's another pane!</div>
+              <div style="width: 15%">I'm one pane in a frame.</div>
+              <div style="width: 70%">I'm another pane in a frame.</div>
+              <div style="width: 15%">Here's another pane!</div>
             </x-frame>
           </div>
         </div>

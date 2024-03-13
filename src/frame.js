@@ -126,12 +126,6 @@ module.exports = createVueComponentWithCSS({
       required: false,
       default: () => "horizontal",
     },
-
-    "start-sizes": {
-      type: Array,
-      required: false,
-      default: () => null,
-    },
   },
 
   data() {
@@ -289,64 +283,14 @@ module.exports = createVueComponentWithCSS({
     window.addEventListener("mouseup", this.onMouseUp)
 
     this.$nextTick(() => {
-      if (this.startSizes) {
-        const parentRect = this.$el.getBoundingClientRect()
-        const startSizesArePercents = sum(this.startSizes) <= 1
-
-        this.widths = this.startSizes.map(v => {
-          if (startSizesArePercents) {
-            return (
-              v *
-              (this.orientation === "horizontal"
-                ? parentRect.width
-                : parentRect.height)
-            )
-          } else {
-            return v
-          }
-        })
-      }
-
       this.onMutation()
+
+      this.widths = Array.from(this.$el.children)
+        .filter(child => !child.classList.contains("x-frame-divider"))
+        .map(child => child.getBoundingClientRect().width)
+
+      this.updateStyles()
     })
-
-    const canvas = document.createElement("canvas")
-
-    canvas.style = /* css */ `
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 10vh;
-    `
-
-    const width = window.innerWidth
-    const height = 0.1 * window.innerHeight
-    canvas.width = width
-    canvas.height = height
-    document.body.appendChild(canvas)
-
-    const context = canvas.getContext("2d")
-
-    const loop = () => {
-      context.clearRect(0, 0, width, height)
-
-      const a = 360 / this.widths.length
-      let x = 0
-      const parentRect = this.$el.getBoundingClientRect()
-      const parentWidth = parentRect.width
-
-      this.widths.forEach((w, i) => {
-        const tempWidth = remap(w, 0, parentWidth, 0, width)
-        context.fillStyle = `hsl(${i * a}, 100%, 50%)`
-        context.fillRect(x, 0, tempWidth, height)
-        x += tempWidth
-      })
-
-      window.requestAnimationFrame(loop)
-    }
-
-    loop()
   },
 
   unmounted() {
