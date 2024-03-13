@@ -50,14 +50,30 @@ const css = /* css */ `
     cursor: col-resize;
     width: 16px;
     height: 100%;
-    background-color: red;
+    margin-left: -7px;
+    margin-right: -7px;
+  }
+
+  .x-frame-horizontal .x-frame-divider .x-frame-divider-inner {
+    background-color: gray;
+    width: 2px;
+    height: 100%;
+    margin: 0 auto;
   }
 
   .x-frame-vertical .x-frame-divider {
     cursor: row-resize;
     width: 100%;
     height: 16px;
-    background-color: red;
+    margin-top: -7px;
+    margin-bottom: -7px;
+  }
+
+  .x-frame-vertical .x-frame-divider .x-frame-divider-inner {
+    background-color: gray;
+    width: 100%;
+    height: 2px;
+    margin: auto 0;
   }
 `
 
@@ -239,6 +255,10 @@ module.exports = createVueComponentWithCSS({
           const divider = document.createElement("div")
           divider.classList.add("x-frame-divider")
           this.$el.insertBefore(divider, child)
+
+          const dividerInner = document.createElement("div")
+          dividerInner.classList.add("x-frame-divider-inner")
+          divider.appendChild(dividerInner)
 
           divider.addEventListener("mousedown", event => {
             this.onMouseDown(event, i)
