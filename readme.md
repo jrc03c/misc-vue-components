@@ -78,7 +78,7 @@ Is emitted when the element is dragged. (Note: Movement must occur for this even
 
 Is emitted when the user stops dragging the element. (Is emitted when the user releases their mouse button or lifts their touch from the screen, not merely when the element is stationary.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
 
-#### `drag-start`
+#### `"drag-start"`
 
 Is emitted when a drag is initiated. Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
 
