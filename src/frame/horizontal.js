@@ -34,18 +34,6 @@ const css = /* css */ `
     flex-shrink: 999999;
   }
 
-  .x-frame-vertical {
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .x-frame-vertical > *:not(.x-frame-divider) {
-    overflow-y: hidden;
-    width: 100%;
-    flex-shrink: 999999;
-  }
-
   .x-frame-horizontal .x-frame-divider {
     cursor: col-resize;
     width: 16px;
@@ -59,21 +47,6 @@ const css = /* css */ `
     width: 2px;
     height: 100%;
     margin: 0 auto;
-  }
-
-  .x-frame-vertical .x-frame-divider {
-    cursor: row-resize;
-    width: 100%;
-    height: 16px;
-    margin-top: -7px;
-    margin-bottom: -7px;
-  }
-
-  .x-frame-vertical .x-frame-divider .x-frame-divider-inner {
-    background-color: gray;
-    width: 100%;
-    height: 2px;
-    margin: auto 0;
   }
 
   .x-frame.is-locked .x-frame-divider {
@@ -90,10 +63,8 @@ const template = /* html */ `
     :class="{
       'is-being-resized': isBeingResized,
       'is-locked': isLocked,
-      'x-frame-horizontal': orientation === 'horizontal',
-      'x-frame-vertical': orientation === 'vertical'
     }"
-    class="x-frame">
+    class="x-frame x-frame-horizontal">
     <slot></slot>
   </div>
 `
@@ -111,7 +82,7 @@ function sum(x) {
 }
 
 module.exports = createVueComponentWithCSS({
-  name: "x-frame",
+  name: "x-frame-horizontal",
   template,
   emits: ["resize", "resize-end", "resize-start"],
 
@@ -132,12 +103,6 @@ module.exports = createVueComponentWithCSS({
       type: Number,
       required: false,
       default: () => 64,
-    },
-
-    orientation: {
-      type: String,
-      required: false,
-      default: () => "horizontal",
     },
   },
 
@@ -166,61 +131,55 @@ module.exports = createVueComponentWithCSS({
 
     onMouseMove(event) {
       if (!this.isLocked && this.isBeingResized) {
-        if (this.orientation === "horizontal") {
-          const dx = event.pageX - this.mouse.x
+        const dx = event.pageX - this.mouse.x
 
-          const dividers = []
-          const nonDividers = []
+        const dividers = []
+        const nonDividers = []
 
-          Array.from(this.$el.children).forEach(child => {
-            if (child.classList.contains("x-frame-divider")) {
-              dividers.push(child)
-            } else {
-              nonDividers.push(child)
-            }
-          })
-
-          const child1 = nonDividers[this.activeDividerIndex]
-          const child2 = nonDividers[this.activeDividerIndex + 1]
-
-          const child1Rect = child1.getBoundingClientRect()
-          const child2Rect = child2.getBoundingClientRect()
-
-          this.widths[this.activeDividerIndex] = child1Rect.width + dx
-          this.widths[this.activeDividerIndex + 1] = child2Rect.width - dx
-
-          if (this.widths[this.activeDividerIndex] < this.minWidth) {
-            const delta = this.widths[this.activeDividerIndex] - this.minWidth
-            this.widths[this.activeDividerIndex] -= delta
-            this.widths[this.activeDividerIndex + 1] += delta
+        Array.from(this.$el.children).forEach(child => {
+          if (child.classList.contains("x-frame-divider")) {
+            dividers.push(child)
+          } else {
+            nonDividers.push(child)
           }
+        })
 
-          if (this.widths[this.activeDividerIndex] > this.maxWidth) {
-            const delta = this.widths[this.activeDividerIndex] - this.maxWidth
-            this.widths[this.activeDividerIndex] -= delta
-            this.widths[this.activeDividerIndex + 1] += delta
-          }
+        const child1 = nonDividers[this.activeDividerIndex]
+        const child2 = nonDividers[this.activeDividerIndex + 1]
 
-          if (this.widths[this.activeDividerIndex + 1] < this.minWidth) {
-            const delta =
-              this.widths[this.activeDividerIndex + 1] - this.minWidth
+        const child1Rect = child1.getBoundingClientRect()
+        const child2Rect = child2.getBoundingClientRect()
 
-            this.widths[this.activeDividerIndex + 1] -= delta
-            this.widths[this.activeDividerIndex] += delta
-          }
+        this.widths[this.activeDividerIndex] = child1Rect.width + dx
+        this.widths[this.activeDividerIndex + 1] = child2Rect.width - dx
 
-          if (this.widths[this.activeDividerIndex + 1] > this.maxWidth) {
-            const delta =
-              this.widths[this.activeDividerIndex + 1] - this.maxWidth
-
-            this.widths[this.activeDividerIndex + 1] -= delta
-            this.widths[this.activeDividerIndex] += delta
-          }
-
-          this.updateStyles()
-        } else {
-          // ...
+        if (this.widths[this.activeDividerIndex] < this.minWidth) {
+          const delta = this.widths[this.activeDividerIndex] - this.minWidth
+          this.widths[this.activeDividerIndex] -= delta
+          this.widths[this.activeDividerIndex + 1] += delta
         }
+
+        if (this.widths[this.activeDividerIndex] > this.maxWidth) {
+          const delta = this.widths[this.activeDividerIndex] - this.maxWidth
+          this.widths[this.activeDividerIndex] -= delta
+          this.widths[this.activeDividerIndex + 1] += delta
+        }
+
+        if (this.widths[this.activeDividerIndex + 1] < this.minWidth) {
+          const delta = this.widths[this.activeDividerIndex + 1] - this.minWidth
+
+          this.widths[this.activeDividerIndex + 1] -= delta
+          this.widths[this.activeDividerIndex] += delta
+        }
+
+        if (this.widths[this.activeDividerIndex + 1] > this.maxWidth) {
+          const delta = this.widths[this.activeDividerIndex + 1] - this.maxWidth
+
+          this.widths[this.activeDividerIndex + 1] -= delta
+          this.widths[this.activeDividerIndex] += delta
+        }
+
+        this.updateStyles()
       }
 
       this.mouse.x = event.pageX

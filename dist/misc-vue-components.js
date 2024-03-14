@@ -219,9 +219,9 @@
     }
   });
 
-  // src/frame.js
-  var require_frame = __commonJS({
-    "src/frame.js"(exports, module) {
+  // src/frame/horizontal.js
+  var require_horizontal = __commonJS({
+    "src/frame/horizontal.js"(exports, module) {
       var css = (
         /* css */
         `
@@ -256,18 +256,6 @@
     flex-shrink: 999999;
   }
 
-  .x-frame-vertical {
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .x-frame-vertical > *:not(.x-frame-divider) {
-    overflow-y: hidden;
-    width: 100%;
-    flex-shrink: 999999;
-  }
-
   .x-frame-horizontal .x-frame-divider {
     cursor: col-resize;
     width: 16px;
@@ -283,21 +271,6 @@
     margin: 0 auto;
   }
 
-  .x-frame-vertical .x-frame-divider {
-    cursor: row-resize;
-    width: 100%;
-    height: 16px;
-    margin-top: -7px;
-    margin-bottom: -7px;
-  }
-
-  .x-frame-vertical .x-frame-divider .x-frame-divider-inner {
-    background-color: gray;
-    width: 100%;
-    height: 2px;
-    margin: auto 0;
-  }
-
   .x-frame.is-locked .x-frame-divider {
     cursor: unset;
   }
@@ -310,10 +283,8 @@
     :class="{
       'is-being-resized': isBeingResized,
       'is-locked': isLocked,
-      'x-frame-horizontal': orientation === 'horizontal',
-      'x-frame-vertical': orientation === 'vertical'
     }"
-    class="x-frame">
+    class="x-frame x-frame-horizontal">
     <slot></slot>
   </div>
 `
@@ -325,7 +296,7 @@
         return s;
       }
       module.exports = createVueComponentWithCSS({
-        name: "x-frame",
+        name: "x-frame-horizontal",
         template,
         emits: ["resize", "resize-end", "resize-start"],
         props: {
@@ -343,11 +314,6 @@
             type: Number,
             required: false,
             default: () => 64
-          },
-          orientation: {
-            type: String,
-            required: false,
-            default: () => "horizontal"
           }
         },
         data() {
@@ -374,46 +340,43 @@
           },
           onMouseMove(event) {
             if (!this.isLocked && this.isBeingResized) {
-              if (this.orientation === "horizontal") {
-                const dx = event.pageX - this.mouse.x;
-                const dividers = [];
-                const nonDividers = [];
-                Array.from(this.$el.children).forEach((child) => {
-                  if (child.classList.contains("x-frame-divider")) {
-                    dividers.push(child);
-                  } else {
-                    nonDividers.push(child);
-                  }
-                });
-                const child1 = nonDividers[this.activeDividerIndex];
-                const child2 = nonDividers[this.activeDividerIndex + 1];
-                const child1Rect = child1.getBoundingClientRect();
-                const child2Rect = child2.getBoundingClientRect();
-                this.widths[this.activeDividerIndex] = child1Rect.width + dx;
-                this.widths[this.activeDividerIndex + 1] = child2Rect.width - dx;
-                if (this.widths[this.activeDividerIndex] < this.minWidth) {
-                  const delta = this.widths[this.activeDividerIndex] - this.minWidth;
-                  this.widths[this.activeDividerIndex] -= delta;
-                  this.widths[this.activeDividerIndex + 1] += delta;
+              const dx = event.pageX - this.mouse.x;
+              const dividers = [];
+              const nonDividers = [];
+              Array.from(this.$el.children).forEach((child) => {
+                if (child.classList.contains("x-frame-divider")) {
+                  dividers.push(child);
+                } else {
+                  nonDividers.push(child);
                 }
-                if (this.widths[this.activeDividerIndex] > this.maxWidth) {
-                  const delta = this.widths[this.activeDividerIndex] - this.maxWidth;
-                  this.widths[this.activeDividerIndex] -= delta;
-                  this.widths[this.activeDividerIndex + 1] += delta;
-                }
-                if (this.widths[this.activeDividerIndex + 1] < this.minWidth) {
-                  const delta = this.widths[this.activeDividerIndex + 1] - this.minWidth;
-                  this.widths[this.activeDividerIndex + 1] -= delta;
-                  this.widths[this.activeDividerIndex] += delta;
-                }
-                if (this.widths[this.activeDividerIndex + 1] > this.maxWidth) {
-                  const delta = this.widths[this.activeDividerIndex + 1] - this.maxWidth;
-                  this.widths[this.activeDividerIndex + 1] -= delta;
-                  this.widths[this.activeDividerIndex] += delta;
-                }
-                this.updateStyles();
-              } else {
+              });
+              const child1 = nonDividers[this.activeDividerIndex];
+              const child2 = nonDividers[this.activeDividerIndex + 1];
+              const child1Rect = child1.getBoundingClientRect();
+              const child2Rect = child2.getBoundingClientRect();
+              this.widths[this.activeDividerIndex] = child1Rect.width + dx;
+              this.widths[this.activeDividerIndex + 1] = child2Rect.width - dx;
+              if (this.widths[this.activeDividerIndex] < this.minWidth) {
+                const delta = this.widths[this.activeDividerIndex] - this.minWidth;
+                this.widths[this.activeDividerIndex] -= delta;
+                this.widths[this.activeDividerIndex + 1] += delta;
               }
+              if (this.widths[this.activeDividerIndex] > this.maxWidth) {
+                const delta = this.widths[this.activeDividerIndex] - this.maxWidth;
+                this.widths[this.activeDividerIndex] -= delta;
+                this.widths[this.activeDividerIndex + 1] += delta;
+              }
+              if (this.widths[this.activeDividerIndex + 1] < this.minWidth) {
+                const delta = this.widths[this.activeDividerIndex + 1] - this.minWidth;
+                this.widths[this.activeDividerIndex + 1] -= delta;
+                this.widths[this.activeDividerIndex] += delta;
+              }
+              if (this.widths[this.activeDividerIndex + 1] > this.maxWidth) {
+                const delta = this.widths[this.activeDividerIndex + 1] - this.maxWidth;
+                this.widths[this.activeDividerIndex + 1] -= delta;
+                this.widths[this.activeDividerIndex] += delta;
+              }
+              this.updateStyles();
             }
             this.mouse.x = event.pageX;
             this.mouse.y = event.pageY;
@@ -489,6 +452,91 @@
           this.observer.disconnect();
           window.removeEventListener("mousemove", this.onMouseMove);
           window.removeEventListener("mouseup", this.onMouseUp);
+        }
+      });
+    }
+  });
+
+  // src/frame/vertical.js
+  var require_vertical = __commonJS({
+    "src/frame/vertical.js"(exports, module) {
+      var css = (
+        /* css */
+        ``
+      );
+      var template = (
+        /* html */
+        ``
+      );
+      var createVueComponentWithCSS = require_src();
+      module.exports = createVueComponentWithCSS({
+        name: "x-frame-vertical",
+        template,
+        data() {
+          return {
+            css
+          };
+        }
+      });
+    }
+  });
+
+  // src/frame/index.js
+  var require_frame = __commonJS({
+    "src/frame/index.js"(exports, module) {
+      var css = (
+        /* css */
+        ``
+      );
+      var template = (
+        /* html */
+        `
+  <x-frame-horizontal
+    :is-locked="isLocked"
+    @resize="$emit('resize', $event)"
+    @resize-end="$emit('resize-end', $event)"
+    @resize-start="$emit('resize-start', $event)"
+    v-if="orientation === 'horizontal'">
+    <slot></slot>
+  </x-frame-horizontal>
+
+  <x-frame-vertical
+    :is-locked="isLocked"
+    @resize="$emit('resize', $event)"
+    @resize-end="$emit('resize-end', $event)"
+    @resize-start="$emit('resize-start', $event)"
+    v-if="orientation === 'vertical'">
+    <slot></slot>
+  </x-frame-vertical>
+`
+      );
+      var createVueComponentWithCSS = require_src();
+      var HorizontalFrameComponent = require_horizontal();
+      var VerticalFrameComponent = require_vertical();
+      module.exports = createVueComponentWithCSS({
+        name: "x-frame",
+        template,
+        emits: ["resize", "resize-end", "resize-start"],
+        components: {
+          "x-frame-horizontal": HorizontalFrameComponent,
+          "x-frame-vertical": VerticalFrameComponent
+        },
+        props: {
+          "is-locked": {
+            type: Boolean,
+            required: false,
+            default: () => false
+          },
+          orientation: {
+            type: String,
+            required: false,
+            default: () => "horizontal"
+          }
+        },
+        data() {
+          return {
+            css
+          };
         }
       });
     }
