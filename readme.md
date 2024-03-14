@@ -50,6 +50,8 @@ const MyComponent = {
 
 ## `Draggable`
 
+![](https://i.ibb.co/94Vyy11/draggable.gif)
+
 ### Props
 
 #### `is-h-locked`
@@ -84,6 +86,8 @@ Is emitted when a drag is initiated. Is passed a [`DOMRect`](https://developer.m
 
 ## `Frame`
 
+![](https://i.ibb.co/P9vjT8q/frame.gif)
+
 ### Props
 
 #### `is-locked`
@@ -117,6 +121,8 @@ Is emitted when the user stops resizing the pane. (Is emitted when the user rele
 Is emitted when pane resizing is initiated. Is passed an array containing the two panes (as `HTMLElement` instances) being resized.
 
 ## `Resizeable`
+
+![](https://i.ibb.co/HgvC0jP/resizeable.gif)
 
 Note that a `Resizeable` is built on top of a `Draggable`; so almost all of the `Draggable` API also applies to `Resizeable`. Any differences are noted below.
 
