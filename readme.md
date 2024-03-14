@@ -88,19 +88,19 @@ Is emitted when a drag is initiated. Is passed a [`DOMRect`](https://developer.m
 
 #### `is-locked`
 
-A boolean indicating whether or not the frame is locked against pane resizing. In other words, if set to `true`, then the panes within the frame cannot be resized. The default is `false`.
+(Optional) A boolean indicating whether or not the frame is locked against pane resizing. In other words, if set to `true`, then the panes within the frame cannot be resized. The default is `false`.
 
 #### `max-size`
 
-A number indicating the maximum possible pane size along the primary axis (i.e., the maximum width of each pane in the case of horizontal frames and the maximum height of each pane in the case of vertical frames). The default is `Infinity`.
+(Optional) A number indicating the maximum possible pane size along the primary axis (i.e., the maximum width of each pane in the case of horizontal frames and the maximum height of each pane in the case of vertical frames). The default is `Infinity`.
 
 #### `min-size`
 
-A number indicating the minimum possible pane size along the primary axis (i.e., the minimum width of each pane in the case of horizontal frames and the minimum height of each pane in the case of vertical frames). The default is `64`.
+(Optional) A number indicating the minimum possible pane size along the primary axis (i.e., the minimum width of each pane in the case of horizontal frames and the minimum height of each pane in the case of vertical frames). The default is `64`.
 
 #### `orientation`
 
-A string representing which way the panes in the frame will be stacked against each other. Must be `"horizontal"` or `"vertical"`. Horizontal frames will contain panes sitting side-by-side. Vertical frames will contain panes sitting on top of one another.
+(Optional) A string representing which way the panes in the frame will be stacked against each other. Must be `"horizontal"` or `"vertical"`. Horizontal frames will contain panes sitting side-by-side. Vertical frames will contain panes sitting on top of one another.
 
 ### Events
 
@@ -130,11 +130,11 @@ Note also that the "Shift" key can be held down during resizing diagonally to ma
 
 #### `is-drag-h-locked`
 
-Is passed as the internal `Draggable` `is-h-locked` prop. The default is `false`.
+(Optional) Is passed as the internal `Draggable` `is-h-locked` prop. The default is `false`.
 
 #### `is-drag-v-locked`
 
-Is passed as the internal `Draggable` `is-v-locked` prop. The default is `false`.
+(Optional) Is passed as the internal `Draggable` `is-v-locked` prop. The default is `false`.
 
 #### `is-resize-bottom-locked`
 
@@ -166,11 +166,11 @@ Is passed as the internal `Draggable` `is-v-locked` prop. The default is `false`
 
 #### `x`
 
-Same as the `Draggable` `x` prop.
+(Optional) Is passed as the `Draggable` `x` prop. The default is `0`.
 
 #### `y`
 
-Same as the `Draggable` `y` prop.
+(Optional) Is passed as the `Draggable` `y` prop. The default is `0`.
 
 ### Events
 
