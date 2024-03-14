@@ -214,8 +214,8 @@
           <div class="demo">
             <x-draggable
               :class="{ 'x-draggable-floating': draggableIsBeingDragged }"
-              :is-horizontally-locked="draggableIsHorizontallyLocked"
-              :is-vertically-locked="draggableIsVerticallyLocked"
+              :is-h-locked="draggableIsHorizontallyLocked"
+              :is-v-locked="draggableIsVerticallyLocked"
               :x="draggableX"
               :y="draggableY"
               @drag-end="draggableIsBeingDragged = false"
@@ -272,12 +272,12 @@
           <div class="demo">
             <x-resizeable
               :class="{ 'x-resizeable-resizing': resizeableIsBeingResized }"
-              :is-horizontal-drag-locked="resizeableIsHorizontalDragLocked"
-              :is-resize-locked-bottom="resizeableIsResizeLockedBottom"
-              :is-resize-locked-left="resizeableIsResizeLockedLeft"
-              :is-resize-locked-right="resizeableIsResizeLockedRight"
-              :is-resize-locked-top="resizeableIsResizeLockedTop"
-              :is-vertical-drag-locked="resizeableIsVerticalDragLocked"
+              :is-drag-h-locked="resizeableIsHorizontalDragLocked"
+              :is-drag-v-locked="resizeableIsVerticalDragLocked"
+              :is-resize-bottom-locked="resizeableIsResizeLockedBottom"
+              :is-resize-left-locked="resizeableIsResizeLockedLeft"
+              :is-resize-right-locked="resizeableIsResizeLockedRight"
+              :is-resize-top-locked="resizeableIsResizeLockedTop"
               :min-height="32"
               :min-width="32"
               :x="resizeableX"

@@ -29,7 +29,7 @@ const css = /* css */ `
 
 const template = /* html */ `
   <div
-    :class="{ 'has-grab-cursor': !isHorizontallyLocked || !isVerticallyLocked }"
+    :class="{ 'has-grab-cursor': !isHLocked || !isVLocked }"
     @mousedown="onMouseDown"
     class="x-draggable">
     <slot></slot>
@@ -48,13 +48,13 @@ module.exports = createVueComponentWithCSS({
   emits: ["drag-end", "drag-start", "drag"],
 
   props: {
-    "is-horizontally-locked": {
+    "is-h-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-vertically-locked": {
+    "is-v-locked": {
       type: Boolean,
       required: false,
       default: () => false,
@@ -100,15 +100,15 @@ module.exports = createVueComponentWithCSS({
       event.preventDefault()
       event.stopPropagation()
 
-      if (this.isHorizontallyLocked && this.isVerticallyLocked) {
+      if (this.isHLocked && this.isVLocked) {
         return
       }
 
-      if (!this.isHorizontallyLocked) {
+      if (!this.isHLocked) {
         this.mouse.x = event.screenX
       }
 
-      if (!this.isVerticallyLocked) {
+      if (!this.isVLocked) {
         this.mouse.y = event.screenY
       }
 
@@ -117,7 +117,7 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseMove(event) {
-      if (this.isHorizontallyLocked && this.isVerticallyLocked) {
+      if (this.isHLocked && this.isVLocked) {
         return
       }
 
@@ -125,12 +125,12 @@ module.exports = createVueComponentWithCSS({
         const dx = event.screenX - this.mouse.x
         const dy = event.screenY - this.mouse.y
 
-        if (!this.isHorizontallyLocked) {
+        if (!this.isHLocked) {
           this.x_ += dx
           this.mouse.x = event.screenX
         }
 
-        if (!this.isVerticallyLocked) {
+        if (!this.isVLocked) {
           this.y_ += dy
           this.mouse.y = event.screenY
         }
@@ -141,7 +141,7 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseUp() {
-      if (this.isHorizontallyLocked && this.isVerticallyLocked) {
+      if (this.isHLocked && this.isVLocked) {
         return
       }
 
@@ -154,11 +154,11 @@ module.exports = createVueComponentWithCSS({
     },
 
     updateComputedStyle(shouldForceUpdate) {
-      if (shouldForceUpdate || !this.isHorizontallyLocked) {
+      if (shouldForceUpdate || !this.isHLocked) {
         this.$el.style.left = this.x_ + "px"
       }
 
-      if (shouldForceUpdate || !this.isVerticallyLocked) {
+      if (shouldForceUpdate || !this.isVLocked) {
         this.$el.style.top = this.y_ + "px"
       }
     },

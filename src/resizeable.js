@@ -16,8 +16,8 @@ const css = /* css */ `
 const template = /* html */ `
   <x-draggable
     :class="{ 'no-pointer-events': shouldPreventInternalPointerEvents }"
-    :is-horizontally-locked="isHorizontalDragLocked"
-    :is-vertically-locked="isVerticalDragLocked"
+    :is-h-locked="isDragHLocked"
+    :is-v-locked="isDragVLocked"
     :x="x_"
     :y="y_"
     @drag-end="onDragEnd"
@@ -60,37 +60,37 @@ module.exports = createVueComponentWithCSS({
       default: () => 256,
     },
 
-    "is-horizontal-drag-locked": {
+    "is-drag-h-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-resize-locked-bottom": {
+    "is-drag-v-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-resize-locked-left": {
+    "is-resize-bottom-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-resize-locked-right": {
+    "is-resize-left-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-resize-locked-top": {
+    "is-resize-right-locked": {
       type: Boolean,
       required: false,
       default: () => false,
     },
 
-    "is-vertical-drag-locked": {
+    "is-resize-top-locked": {
       type: Boolean,
       required: false,
       default: () => false,
@@ -152,10 +152,10 @@ module.exports = createVueComponentWithCSS({
   computed: {
     isCompletelyLocked() {
       return (
-        this.isResizeLockedLeft &&
-        this.isResizeLockedRight &&
-        this.isResizeLockedTop &&
-        this.isResizeLockedBottom
+        this.isResizeLeftLocked &&
+        this.isResizeRightLocked &&
+        this.isResizeTopLocked &&
+        this.isResizeBottomLocked
       )
     },
   },
@@ -228,25 +228,25 @@ module.exports = createVueComponentWithCSS({
 
       let shouldCancelEvent = false
 
-      if (this.isHoveringOverLeftBorder && !this.isResizeLockedLeft) {
+      if (this.isHoveringOverLeftBorder && !this.isResizeLeftLocked) {
         this.isBeingResizedHorizontally = true
         this.anchoredLeftRightBorder = "right"
         shouldCancelEvent = true
       }
 
-      if (this.isHoveringOverRightBorder && !this.isResizeLockedRight) {
+      if (this.isHoveringOverRightBorder && !this.isResizeRightLocked) {
         this.isBeingResizedHorizontally = true
         this.anchoredLeftRightBorder = "left"
         shouldCancelEvent = true
       }
 
-      if (this.isHoveringOverTopBorder && !this.isResizeLockedTop) {
+      if (this.isHoveringOverTopBorder && !this.isResizeTopLocked) {
         this.isBeingResizedVertically = true
         this.anchoredTopBottomBorder = "bottom"
         shouldCancelEvent = true
       }
 
-      if (this.isHoveringOverBottomBorder && !this.isResizeLockedBottom) {
+      if (this.isHoveringOverBottomBorder && !this.isResizeBottomLocked) {
         this.isBeingResizedVertically = true
         this.anchoredTopBottomBorder = "top"
         shouldCancelEvent = true
@@ -498,16 +498,16 @@ module.exports = createVueComponentWithCSS({
 
     updateComputedStyle() {
       const shouldResizeLeft =
-        this.isHoveringOverLeftBorder && !this.isResizeLockedLeft
+        this.isHoveringOverLeftBorder && !this.isResizeLeftLocked
 
       const shouldResizeRight =
-        this.isHoveringOverRightBorder && !this.isResizeLockedRight
+        this.isHoveringOverRightBorder && !this.isResizeRightLocked
 
       const shouldResizeTop =
-        this.isHoveringOverTopBorder && !this.isResizeLockedTop
+        this.isHoveringOverTopBorder && !this.isResizeTopLocked
 
       const shouldResizeBottom =
-        this.isHoveringOverBottomBorder && !this.isResizeLockedBottom
+        this.isHoveringOverBottomBorder && !this.isResizeBottomLocked
 
       document.body.style.cursor = "unset"
 

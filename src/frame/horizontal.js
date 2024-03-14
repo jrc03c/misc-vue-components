@@ -123,10 +123,20 @@ module.exports = createVueComponentWithCSS({
       if (this.isLocked) return
       this.isBeingResized = true
       this.activeDividerIndex = dividerIndex
-      this.$emit("resize-start")
+
+      const nonDividers = Array.from(this.$el.children).filter(
+        child => !child.classList.contains("x-frame-divider"),
+      )
+
+      const left = nonDividers[this.activeDividerIndex]
+      const right = nonDividers[this.activeDividerIndex + 1]
+
+      this.$emit("resize-start", [left, right])
     },
 
     onMouseMove(event) {
+      let left, right
+
       if (!this.isLocked && this.isBeingResized) {
         const dx = event.pageX - this.mouse.x
 
@@ -143,6 +153,8 @@ module.exports = createVueComponentWithCSS({
 
         const child1 = nonDividers[this.activeDividerIndex]
         const child2 = nonDividers[this.activeDividerIndex + 1]
+        left = child1
+        right = child2
 
         const child1Rect = child1.getBoundingClientRect()
         const child2Rect = child2.getBoundingClientRect()
@@ -182,7 +194,7 @@ module.exports = createVueComponentWithCSS({
       this.mouse.x = event.pageX
 
       if (!this.isLocked) {
-        this.$emit("resize")
+        this.$emit("resize", [left, right])
       }
     },
 
@@ -192,7 +204,14 @@ module.exports = createVueComponentWithCSS({
       this.isBeingResized = false
 
       if (wasBeingResized) {
-        this.$emit("resize-end")
+        const nonDividers = Array.from(this.$el.children).filter(
+          child => !child.classList.contains("x-frame-divider"),
+        )
+
+        const left = nonDividers[this.activeDividerIndex]
+        const right = nonDividers[this.activeDividerIndex + 1]
+
+        this.$emit("resize-end", [left, right])
       }
     },
 

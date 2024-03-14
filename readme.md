@@ -51,9 +51,13 @@ const MyComponent = {
 
 ### Props
 
-#### `is-locked`
+#### `is-h-locked`
 
-(Optional) A boolean indicating whether or not the element is locked to its current position. In other words, if set to `true`, then the element cannot be dragged. The default is `false`.
+(Optional) A boolean indicating whether or not the element is locked to its current horizontal position. In other words, if set to `true`, then the element cannot be dragged left or right. The default is `false`.
+
+#### `is-v-locked`
+
+(Optional) A boolean indicating whether or not the element is locked to its current vertical position. In other words, if set to `true`, then the element cannot be dragged up or down. The default is `false`.
 
 #### `x`
 
@@ -65,6 +69,10 @@ const MyComponent = {
 
 ### Events
 
+#### `"drag"`
+
+Is emitted when the element is dragged. (Note: Movement must occur for this event to be emitted; i.e., it is not emitted while the element is stationary, even if the user has already initiated a drag.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
+
 #### `"drag-end"`
 
 Is emitted when the user stops dragging the element. (Is emitted when the user releases their mouse button or lifts their touch from the screen, not merely when the element is stationary.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
@@ -73,9 +81,39 @@ Is emitted when the user stops dragging the element. (Is emitted when the user r
 
 Is emitted when a drag is initiated. Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
 
-#### `"drag"`
+## `Frame`
 
-Is emitted when the element is dragged. (Note: Movement must occur for this event to be emitted; i.e., it is not emitted while the element is stationary, even if the user has already initiated a drag.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
+### Props
+
+#### `is-locked`
+
+A boolean indicating whether or not the frame is locked against pane resizing. In other words, if set to `true`, then the panes within the frame cannot be resized. The default is `false`.
+
+#### `max-size`
+
+A number indicating the maximum possible pane size along the primary axis (i.e., the maximum width of each pane in the case of horizontal frames and the maximum height of each pane in the case of vertical frames). The default is `Infinity`.
+
+#### `min-size`
+
+A number indicating the minimum possible pane size along the primary axis (i.e., the minimum width of each pane in the case of horizontal frames and the minimum height of each pane in the case of vertical frames). The default is `64`.
+
+#### `orientation`
+
+A string representing which way the panes in the frame will be stacked against each other. Must be `"horizontal"` or `"vertical"`. Horizontal frames will contain panes sitting side-by-side. Vertical frames will contain panes sitting on top of one another.
+
+### Events
+
+#### `"resize"`
+
+Is emitted when a pane is resized. (Note: Size change must occur for this event to be emitted; i.e., it is not emitted while a pane is not changing size, even if the user has already initiated the resizing process.) Is passed an array containing the two panes (as `HTMLElement` instances) being resized.
+
+#### `"resize-end"`
+
+Is emitted when the user stops resizing the pane. (Is emitted when the user releases their mouse button or lifts their touch from the screen, not merely when the mouse or touch is stationary while in the process of resizing.) Is passed an array containing the two panes (as `HTMLElement` instances) that were being resized.
+
+#### `"resize-start"`
+
+Is emitted when pane resizing is initiated. Is passed an array containing the two panes (as `HTMLElement` instances) being resized.
 
 ## `Resizeable`
 
@@ -89,13 +127,29 @@ Note also that the "Shift" key can be held down during resizing diagonally to ma
 
 (Optional) A number representing the height in pixels of the element's bounding box. The default is `256`.
 
-#### `is-drag-locked`
+#### `is-drag-h-locked`
 
-Same as the `Draggable` `is-locked` prop (but renamed to remove ambiguity in the context of this component).
+Is passed as the internal `Draggable` `is-h-locked` prop. The default is `false`.
 
-#### `is-resize-locked`
+#### `is-drag-v-locked`
 
-(Optional) A boolean indicating whether or not the element is locked to its current size. In other words, if set to `true`, then the element cannot be resized. The default is `false`.
+Is passed as the internal `Draggable` `is-v-locked` prop. The default is `false`.
+
+#### `is-resize-bottom-locked`
+
+(Optional) A boolean indicating whether or not the element's bottom border is locked against resizing. In other words, if set to `true`, then the element cannot be resized by dragging its bottom border up or down. The default is `false`.
+
+#### `is-resize-left-locked`
+
+(Optional) A boolean indicating whether or not the element's left border is locked against resizing. In other words, if set to `true`, then the element cannot be resized by dragging its left border to the left or right. The default is `false`.
+
+#### `is-resize-right-locked`
+
+(Optional) A boolean indicating whether or not the element's right border is locked against resizing. In other words, if set to `true`, then the element cannot be resized by dragging its right border to the left or right. The default is `false`.
+
+#### `is-resize-top-locked`
+
+(Optional) A boolean indicating whether or not the element's top border is locked against resizing. In other words, if set to `true`, then the element cannot be resized by dragging its top border up or down. The default is `false`.
 
 #### `min-height`
 
@@ -119,6 +173,10 @@ Same as the `Draggable` `y` prop.
 
 ### Events
 
+#### `"drag"`
+
+Same as the `Draggable` `"drag"` event.
+
 #### `"drag-end"`
 
 Same as the `Draggable` `"drag-end"` event.
@@ -127,9 +185,9 @@ Same as the `Draggable` `"drag-end"` event.
 
 Same as the `Draggable` `"drag-start"` event.
 
-#### `"drag"`
+#### `"resize"`
 
-Same as the `Draggable` `"drag"` event.
+Is emitted when the element is resized. (Note: Size change must occur for this event to be emitted; i.e., it is not emitted while the element is not changing size, even if the user has already initiated the resizing process.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
 
 #### `"resize-end"`
 
@@ -138,7 +196,3 @@ Is emitted when the user stops resizing the element. (Is emitted when the user r
 #### `"resize-start"`
 
 Is emitted when resizing is initiated. Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
-
-#### `"resize"`
-
-Is emitted when the element is resized. (Note: Size change must occur for this event to be emitted; i.e., it is not emitted while the element is not changing size, even if the user has already initiated the resizing process.) Is passed a [`DOMRect`](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) representing the bounding box of the element.
