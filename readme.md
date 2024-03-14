@@ -15,7 +15,7 @@ npm install --save @jrc03c/misc-vue-components
 **With bundlers:**
 
 ```js
-const { Draggable, Resizeable } = require("@jrc03c/misc-vue-components")
+const { Draggable, Framee, Resizeable } = require("@jrc03c/misc-vue-components")
 ```
 
 **Without bundlers:**
@@ -29,7 +29,7 @@ Add the script to your HTML:
 And then in your JS:
 
 ```js
-const { Draggable, Resizeable } = MiscVueComponents
+const { Draggable, Frame, Resizeable } = MiscVueComponents
 ```
 
 ## Add to a Vue app or component
@@ -40,6 +40,7 @@ const MyComponent = {
 
   components: {
     "x-draggable": Draggable,
+    "x-frame": Frame,
     "x-resizeable": Resizeable,
   },
 }
