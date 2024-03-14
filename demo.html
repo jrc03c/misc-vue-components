@@ -84,6 +84,10 @@
         color: white;
       }
 
+      .demo:has(.x-frame.x-frame-vertical) {
+        height: 512px;
+      }
+
       .x-draggable {
         padding: 1rem;
         background-color: green;
@@ -142,15 +146,37 @@
             <input type="checkbox" v-model="frameIsLocked" />
           </p>
 
+          <p>
+            Orientation:
+
+            <input
+              id="orientation-input-horizontal"
+              name="frameOrientation"
+              type="radio"
+              value="horizontal"
+              v-model="frameOrientation" />
+
+            <label for="orientation-input-horizontal">Horizontal</label>
+
+            <input
+              id="orientation-input-vertical"
+              name="frameOrientation"
+              type="radio"
+              value="vertical"
+              v-model="frameOrientation" />
+
+            <label for="orientation-input-vertical">Vertical</label>
+          </p>
+
           <div class="demo">
             <x-frame
-              :class="{ 'x-frame-resizing': frameIsBeingResized }"
               :is-locked="frameIsLocked"
+              :orientation="frameOrientation"
               @resize-end="frameIsBeingResized = false"
               @resize-start="frameIsBeingResized = true">
-              <div style="width: 15%">I'm one pane in a frame.</div>
-              <div style="width: 70%">I'm another pane in a frame.</div>
-              <div style="width: 15%">Here's another pane!</div>
+              <div>I'm one pane in a frame.</div>
+              <div>I'm another pane in a frame.</div>
+              <div>Here's another pane!</div>
             </x-frame>
           </div>
         </div>
@@ -280,6 +306,7 @@
               draggableY: 32,
               frameIsBeingResized: false,
               frameIsLocked: false,
+              frameOrientation: "vertical",
               frameSectionIsExpanded: true,
               resizeableIsBeingResized: false,
               resizeableIsHorizontalDragLocked: false,

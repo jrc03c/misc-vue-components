@@ -11,6 +11,8 @@ const css = /* css */ ``
 const template = /* html */ `
   <x-frame-horizontal
     :is-locked="isLocked"
+    :max-width="maxSize"
+    :min-width="minSize"
     @resize="$emit('resize', $event)"
     @resize-end="$emit('resize-end', $event)"
     @resize-start="$emit('resize-start', $event)"
@@ -20,6 +22,8 @@ const template = /* html */ `
 
   <x-frame-vertical
     :is-locked="isLocked"
+    :max-height="maxSize"
+    :min-height="minSize"
     @resize="$emit('resize', $event)"
     @resize-end="$emit('resize-end', $event)"
     @resize-start="$emit('resize-start', $event)"
@@ -51,6 +55,18 @@ module.exports = createVueComponentWithCSS({
       type: Boolean,
       required: false,
       default: () => false,
+    },
+
+    "max-size": {
+      type: Number,
+      required: false,
+      default: () => Infinity,
+    },
+
+    "min-size": {
+      type: Number,
+      required: false,
+      default: () => 64,
     },
 
     orientation: {

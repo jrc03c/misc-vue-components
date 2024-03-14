@@ -112,10 +112,7 @@ module.exports = createVueComponentWithCSS({
       css,
       isAddingDividers: false,
       isBeingResized: false,
-      mouse: {
-        x: 0,
-        y: 0,
-      },
+      mouse: { x: 0 },
       observer: null,
       widths: [],
     }
@@ -183,7 +180,6 @@ module.exports = createVueComponentWithCSS({
       }
 
       this.mouse.x = event.pageX
-      this.mouse.y = event.pageY
 
       if (!this.isLocked) {
         this.$emit("resize")
