@@ -1,6 +1,6 @@
 {
   "name": "@jrc03c/misc-vue-components",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "src/index.js",
   "dependencies": {
     "@jrc03c/vue-component-with-css": "^0.0.6"
