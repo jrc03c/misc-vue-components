@@ -259,7 +259,6 @@
   .x-frame-horizontal .x-frame-divider {
     cursor: col-resize;
     width: 16px;
-    height: 100%;
     margin-left: -7px;
     margin-right: -7px;
   }
@@ -498,14 +497,12 @@
   }
 
   .x-frame-vertical > *:not(.x-frame-divider) {
-    overflow-y: hidden;
     height: 100%;
     flex-shrink: 999999;
   }
 
   .x-frame-vertical .x-frame-divider {
     cursor: row-resize;
-    width: 100%;
     height: 16px;
     margin-top: -7px;
     margin-bottom: -7px;

@@ -37,7 +37,6 @@ const css = /* css */ `
   .x-frame-horizontal .x-frame-divider {
     cursor: col-resize;
     width: 16px;
-    height: 100%;
     margin-left: -7px;
     margin-right: -7px;
   }

@@ -29,14 +29,12 @@ const css = /* css */ `
   }
 
   .x-frame-vertical > *:not(.x-frame-divider) {
-    overflow-y: hidden;
     height: 100%;
     flex-shrink: 999999;
   }
 
   .x-frame-vertical .x-frame-divider {
     cursor: row-resize;
-    width: 100%;
     height: 16px;
     margin-top: -7px;
     margin-bottom: -7px;
