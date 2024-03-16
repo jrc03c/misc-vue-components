@@ -34,21 +34,21 @@ const css = /* css */ `
     flex-shrink: 999999;
   }
 
-  .x-frame-horizontal .x-frame-divider {
+  .x-frame-horizontal > .x-frame-divider {
     cursor: col-resize;
     width: 16px;
     margin-left: -7px;
     margin-right: -7px;
   }
 
-  .x-frame-horizontal .x-frame-divider .x-frame-divider-inner {
+  .x-frame-horizontal > .x-frame-divider > .x-frame-divider-inner {
     background-color: gray;
     width: 2px;
     height: 100%;
     margin: 0 auto;
   }
 
-  .x-frame.is-locked .x-frame-divider {
+  .x-frame.is-locked > .x-frame-divider {
     cursor: unset;
   }
 `

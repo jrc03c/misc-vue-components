@@ -34,7 +34,7 @@ const css = /* css */ `
     overflow-y: auto;
   }
 
-  .x-frame-vertical .x-frame-divider {
+  .x-frame-vertical > .x-frame-divider {
     cursor: row-resize;
     height: 16px;
     margin-top: -7px;
@@ -47,13 +47,13 @@ const css = /* css */ `
     align-items: center;
   }
 
-  .x-frame-vertical .x-frame-divider .x-frame-divider-inner {
+  .x-frame-vertical > .x-frame-divider > .x-frame-divider-inner {
     background-color: gray;
     width: 100%;
     height: 2px;
   }
 
-  .x-frame.is-locked .x-frame-divider {
+  .x-frame.is-locked > .x-frame-divider {
     cursor: unset;
   }
 `
