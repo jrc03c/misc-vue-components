@@ -499,6 +499,7 @@
   .x-frame-vertical > *:not(.x-frame-divider) {
     height: 100%;
     flex-shrink: 999999;
+    overflow-y: auto;
   }
 
   .x-frame-vertical .x-frame-divider {
