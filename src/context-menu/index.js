@@ -73,7 +73,6 @@ const template = /* html */ `
     </div>
 
     <x-context-menu
-      :is-root="false"
       :is-visible="true"
       :items="hoveredItemWithChildren.children"
       :x="hoveredItemWithChildrenX"
@@ -95,12 +94,6 @@ module.exports = createVueComponentWithCSS({
   emits: ["cancel", "close", "open", "select"],
 
   props: {
-    "is-root": {
-      type: Boolean,
-      required: false,
-      default: () => true,
-    },
-
     "is-visible": {
       type: Boolean,
       required: true,
@@ -142,15 +135,13 @@ module.exports = createVueComponentWithCSS({
     }
   },
 
-  watch: {
+  computed: {
     isRoot() {
-      if (this.isRoot) {
-        this.addListeners()
-      } else {
-        this.removeListeners()
-      }
+      return this.getRootContextMenu() === this.$el
     },
+  },
 
+  watch: {
     isVisible() {
       if (this.isVisible) {
         this.$emit("open")
@@ -173,10 +164,26 @@ module.exports = createVueComponentWithCSS({
 
   methods: {
     addListeners() {
-      if (this.listenersHaveBeenAdded) return
-      window.addEventListener("click", this.onClick)
-      window.addEventListener("keydown", this.onKeyDown)
-      this.listenersHaveBeenAdded = true
+      if (this.isRoot && !this.listenersHaveBeenAdded) {
+        window.addEventListener("click", this.onClick)
+        window.addEventListener("keydown", this.onKeyDown)
+        this.listenersHaveBeenAdded = true
+      }
+    },
+
+    getRootContextMenu() {
+      let current = this.$el
+      let root = this.$el
+
+      while (current.parentElement) {
+        if (current.parentElement.classList.contains("x-context-menu")) {
+          root = current.parentElement
+        }
+
+        current = current.parentElement
+      }
+
+      return root
     },
 
     onClick() {
@@ -190,10 +197,11 @@ module.exports = createVueComponentWithCSS({
     },
 
     removeListeners() {
-      if (!this.listenersHaveBeenAdded) return
-      window.removeEventListener("click", this.onClick)
-      window.removeEventListener("keydown", this.onKeyDown)
-      this.listenersHaveBeenAdded = false
+      if (this.listenersHaveBeenAdded) {
+        window.removeEventListener("click", this.onClick)
+        window.removeEventListener("keydown", this.onKeyDown)
+        this.listenersHaveBeenAdded = false
+      }
     },
 
     select(item) {
