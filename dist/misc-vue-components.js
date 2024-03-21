@@ -76,7 +76,7 @@
   .x-context-menu {
     z-index: 999999999;
     background-color: rgb(235, 235, 235);
-    position: fixed;
+    position: absolute;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     font-size: 0.85rem;
   }
@@ -258,8 +258,10 @@
           showChildren(event, item) {
             if (item.children) {
               this.hoveredItemWithChildren = item;
-              this.hoveredItemWithChildrenX = this.x + this.$refs.itemsContainer.getBoundingClientRect().width;
-              this.hoveredItemWithChildrenY = event.target.getBoundingClientRect().y;
+              const rect = this.$refs.itemsContainer.getBoundingClientRect();
+              const targetRect = event.target.getBoundingClientRect();
+              this.hoveredItemWithChildrenX = rect.width;
+              this.hoveredItemWithChildrenY = targetRect.y - rect.y;
             } else {
               this.hoveredItemWithChildren = null;
               this.hoveredItemWithChildrenX = 0;
