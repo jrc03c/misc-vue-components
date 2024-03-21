@@ -78,7 +78,7 @@
     background-color: rgb(235, 235, 235);
     position: absolute;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .x-context-menu .x-context-menu-item {
