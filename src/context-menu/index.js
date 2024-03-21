@@ -98,10 +98,6 @@ const template = /* html */ `
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 const pause = require("@jrc03c/pause")
 
-function clamp(x, a, b) {
-  return x < a ? a : x > b ? b : x
-}
-
 module.exports = createVueComponentWithCSS({
   name: "x-context-menu",
   template,
