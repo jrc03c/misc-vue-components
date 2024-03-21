@@ -131,6 +131,34 @@
 
       <section>
         <h2>
+          <span>Context Menu</span>
+
+          <button
+            :class="{ 'is-expanded': contextMenuSectionIsExpanded }"
+            @click="
+              contextMenuSectionIsExpanded = !contextMenuSectionIsExpanded
+            "
+            class="expand-button">
+            ❯
+          </button>
+        </h2>
+
+        <div @contextmenu.stop.prevent="showContextMenu" class="demo">
+          <x-context-menu
+            :is-visible="contextMenuIsVisible"
+            :items="contextMenuItems"
+            :x="contextMenuX"
+            :y="contextMenuY"
+            @cancel="contextMenuIsVisible = false"
+            @close="() => {}"
+            @open="() => {}"
+            @select="contextMenuIsVisible = false">
+          </x-context-menu>
+        </div>
+      </section>
+
+      <section>
+        <h2>
           <span>Frame</span>
 
           <button
@@ -292,6 +320,7 @@
       window.addEventListener("load", () => {
         const app = Vue.createApp({
           components: {
+            "x-context-menu": MiscVueComponents.ContextMenu,
             "x-draggable": MiscVueComponents.Draggable,
             "x-frame": MiscVueComponents.Frame,
             "x-resizeable": MiscVueComponents.Resizeable,
@@ -299,6 +328,15 @@
 
           data() {
             return {
+              contextMenuIsVisible: false,
+              contextMenuItems: [
+                { label: "Hello!" },
+                { label: "Click me..." },
+                { label: "I have children", children: [] },
+              ],
+              contextMenuSectionIsExpanded: true,
+              contextMenuX: 0,
+              contextMenuY: 0,
               draggableIsBeingDragged: false,
               draggableIsHorizontallyLocked: false,
               draggableIsVerticallyLocked: false,
@@ -331,6 +369,12 @@
               }
 
               return out
+            },
+
+            showContextMenu(event) {
+              this.contextMenuIsVisible = true
+              this.contextMenuX = event.clientX
+              this.contextMenuY = event.clientY
             },
           },
 

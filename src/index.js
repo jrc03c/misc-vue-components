@@ -1,4 +1,5 @@
 const MiscVueComponents = {
+  ContextMenu: require("./context-menu"),
   Draggable: require("./draggable"),
   Frame: require("./frame"),
   Resizeable: require("./resizeable"),
