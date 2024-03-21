@@ -23,12 +23,13 @@ const css = /* css */ `
     user-select: none;
   }
 
-  .x-context-menu .x-context-menu-item:hover {
-    background-color: rgb(245, 245, 245);
+  .x-context-menu .x-context-menu-item:hover,
+  .x-context-menu .x-context-menu-item.has-expanded-children {
+    background-color: rgb(255, 255, 255);
   }
 
   .x-context-menu .x-context-menu-item:active {
-    background-color: rgb(215, 215, 215);
+    background-color: rgb(205, 205, 205);
   }
 
   .x-context-menu .context-menu-item-label  {
@@ -51,22 +52,34 @@ const template = /* html */ `
     @click.stop.prevent="() => {}"
     class="x-context-menu"
     v-if="isVisible">
-    <div
-      :key="item.label"
-      @click="select(item)"
-      @mouseenter="showChildren(item)"
-      @mouseleave="hideChildren(item)"
-      class="x-context-menu-item"
-      v-for="item in items">
-      <span class="x-context-menu-item-label">
-        {{ item.label }}
-      </span>
+    <div class="x-context-menu-items" ref="itemsContainer">
+      <div
+        :class="{ 'has-expanded-children': hoveredItemWithChildren === item }"
+        :key="item.label"
+        @click="select(item)"
+        @mouseenter="showChildren($event, item)"
+        @mouseleave="hideChildren()"
+        class="x-context-menu-item"
+        v-for="item in items">
+        <span class="x-context-menu-item-label">
+          {{ item.label }}
+        </span>
 
-      <span
-        class="x-context-menu-item-label-expand-arrow"
-        v-if="item.children">
-      </span>
+        <span
+          class="x-context-menu-item-label-expand-arrow"
+          v-if="item.children">
+        </span>
+      </div>
     </div>
+
+    <x-context-menu
+      :is-root="false"
+      :is-visible="true"
+      :items="hoveredItemWithChildren.children"
+      :x="hoveredItemWithChildrenX"
+      :y="hoveredItemWithChildrenY"
+      v-if="hoveredItemWithChildren">
+    </x-context-menu>
   </div>
 `
 
@@ -82,6 +95,12 @@ module.exports = createVueComponentWithCSS({
   emits: ["cancel", "close", "open", "select"],
 
   props: {
+    "is-root": {
+      type: Boolean,
+      required: false,
+      default: () => true,
+    },
+
     "is-visible": {
       type: Boolean,
       required: true,
@@ -116,16 +135,30 @@ module.exports = createVueComponentWithCSS({
     return {
       computedStyle: "",
       css,
-      visibleChildren: {},
+      hoveredItemWithChildren: null,
+      hoveredItemWithChildrenX: 0,
+      hoveredItemWithChildrenY: 0,
+      listenersHaveBeenAdded: false,
     }
   },
 
   watch: {
+    isRoot() {
+      if (this.isRoot) {
+        this.addListeners()
+      } else {
+        this.removeListeners()
+      }
+    },
+
     isVisible() {
       if (this.isVisible) {
         this.$emit("open")
       } else {
         this.$emit("close")
+        this.hoveredItemWithChildren = null
+        this.hoveredItemWithChildrenX = 0
+        this.hoveredItemWithChildrenY = 0
       }
     },
 
@@ -139,8 +172,15 @@ module.exports = createVueComponentWithCSS({
   },
 
   methods: {
-    hideChildren(item) {
-      this.visibleChildren[item.label] = false
+    addListeners() {
+      if (this.listenersHaveBeenAdded) return
+      window.addEventListener("click", this.onClick)
+      window.addEventListener("keydown", this.onKeyDown)
+      this.listenersHaveBeenAdded = true
+    },
+
+    hideChildren() {
+      // this.hoveredItemWithChildren = null
     },
 
     onClick() {
@@ -151,6 +191,13 @@ module.exports = createVueComponentWithCSS({
       if (event.key === "Escape") {
         this.$emit("cancel")
       }
+    },
+
+    removeListeners() {
+      if (!this.listenersHaveBeenAdded) return
+      window.removeEventListener("click", this.onClick)
+      window.removeEventListener("keydown", this.onKeyDown)
+      this.listenersHaveBeenAdded = false
     },
 
     select(item) {
@@ -165,8 +212,15 @@ module.exports = createVueComponentWithCSS({
       this.$emit("select", item)
     },
 
-    showChildren(item) {
-      this.visibleChildren[item.label] = true
+    showChildren(event, item) {
+      if (item.children) {
+        this.hoveredItemWithChildren = item
+
+        this.hoveredItemWithChildrenX =
+          this.x + this.$refs.itemsContainer.getBoundingClientRect().width
+
+        this.hoveredItemWithChildrenY = event.target.getBoundingClientRect().y
+      }
     },
 
     updateComputedStyle() {
@@ -178,12 +232,11 @@ module.exports = createVueComponentWithCSS({
   },
 
   mounted() {
-    window.addEventListener("click", this.onClick)
-    window.addEventListener("keydown", this.onKeyDown)
+    this.addListeners()
+    this.updateComputedStyle()
   },
 
   unmounted() {
-    window.removeEventListener("click", this.onClick)
-    window.removeEventListener("keydown", this.onKeyDown)
+    this.removeListeners()
   },
 })

@@ -354,7 +354,21 @@
                     this.contextMenuDemoBackgroundColor = `hsl(${Math.random() * 360}deg, 100%, 85%)`
                   },
                 },
-                { label: "Hover for submenu", children: [] },
+                {
+                  label: "Hover for submenu",
+                  children: [
+                    { label: "Oh, god..." },
+                    { label: "Nope." },
+                    {
+                      label: "Click here for another alert...",
+                      action: () => alert("You've been alerted AGAIN!"),
+                    },
+                  ],
+                },
+                {
+                  label: "Hover for ANOTHER submenu",
+                  children: [{ label: "A, B, C" }, { label: "1, 2, 3" }],
+                },
               ],
               contextMenuSectionIsExpanded: true,
               contextMenuX: 0,
