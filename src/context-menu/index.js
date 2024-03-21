@@ -6,9 +6,18 @@ const css = /* css */ `
   .x-context-menu {
     z-index: 999999999;
     background-color: rgb(235, 235, 235);
-    position: absolute;
+    position: fixed;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     font-size: 0.75rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+
+  .x-context-menu.is-visible {
+    pointer-events: all;
+    opacity: 1;
+    transition: opacity 0.1s ease;
   }
 
   .x-context-menu .x-context-menu-item {
@@ -49,10 +58,10 @@ const css = /* css */ `
 
 const template = /* html */ `
   <div
+    :class="{ 'is-visible': isVisible }"
     :style="computedStyle"
     @click.stop.prevent="() => {}"
-    class="x-context-menu"
-    v-if="isVisible">
+    class="x-context-menu">
     <div class="x-context-menu-items" ref="itemsContainer">
       <div
         :class="{ 'has-expanded-children': hoveredItemWithChildren === item }"
@@ -87,6 +96,11 @@ const template = /* html */ `
 // -----------------------------------------------------------------------------
 
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
+const pause = require("@jrc03c/pause")
+
+function clamp(x, a, b) {
+  return x < a ? a : x > b ? b : x
+}
 
 module.exports = createVueComponentWithCSS({
   name: "x-context-menu",
@@ -171,6 +185,20 @@ module.exports = createVueComponentWithCSS({
       }
     },
 
+    getParentContextMenu() {
+      let current = this.$el
+
+      while (current.parentElement) {
+        if (current.parentElement.classList.contains("x-context-menu")) {
+          return current.parentElement
+        }
+
+        current = current.parentElement
+      }
+
+      return this.$el
+    },
+
     getRootContextMenu() {
       let current = this.$el
       let root = this.$el
@@ -222,8 +250,8 @@ module.exports = createVueComponentWithCSS({
 
         const rect = this.$refs.itemsContainer.getBoundingClientRect()
         const targetRect = event.target.getBoundingClientRect()
-        this.hoveredItemWithChildrenX = rect.width
-        this.hoveredItemWithChildrenY = targetRect.y - rect.y
+        this.hoveredItemWithChildrenX = this.x + rect.width
+        this.hoveredItemWithChildrenY = this.y + targetRect.y - rect.y
       } else {
         this.hoveredItemWithChildren = null
         this.hoveredItemWithChildrenX = 0
@@ -231,10 +259,38 @@ module.exports = createVueComponentWithCSS({
       }
     },
 
-    updateComputedStyle() {
+    async updateComputedStyle() {
+      while (!this.$refs.itemsContainer) {
+        await pause(10)
+      }
+
+      let x = this.x
+      let y = this.y
+      const itemsRect = this.$refs.itemsContainer.getBoundingClientRect()
+
+      if (this.isRoot) {
+        if (x + itemsRect.width > window.innerWidth) {
+          x = window.innerWidth - itemsRect.width
+        }
+      } else {
+        const parentMenu = this.getParentContextMenu()
+        const parentMenuRect = parentMenu.getBoundingClientRect()
+
+        const parentMenuItemsRect = parentMenu
+          .querySelector(".x-context-menu-items")
+          .getBoundingClientRect()
+
+        if (
+          parentMenuRect.x + parentMenuItemsRect.width + itemsRect.width >
+          window.innerWidth
+        ) {
+          x = parentMenuItemsRect.x - itemsRect.width
+        }
+      }
+
       this.computedStyle = `
-        left: ${this.x}px;
-        top: ${this.y}px;
+        left: ${x}px;
+        top: ${y}px;
       `
 
       this.hoveredItemWithChildren = null
