@@ -90,6 +90,7 @@
     gap: 1rem;
     cursor: pointer;
     padding: 0.5rem;
+    user-select: none;
   }
 
   .x-context-menu .x-context-menu-item:hover {
@@ -204,6 +205,9 @@
             }
           },
           select(item) {
+            if (item.children) {
+              return;
+            }
             if (item.action) {
               item.action();
             }
