@@ -80,13 +80,17 @@
 
       .x-context-menu .x-context-menu-item {
         border-bottom: 2px solid rgb(215, 215, 215);
-        width: 256px;
+        /* width: 256px;
         min-width: 256px;
-        max-width: 256px;
+        max-width: 256px; */
       }
 
       .x-context-menu .x-context-menu-item:last-child {
         border-bottom: 0;
+      }
+
+      .demo:has(.x-context-menu) {
+        height: 1024px;
       }
 
       .x-frame > *:not(.x-frame-divider) {
@@ -360,7 +364,18 @@
                 {
                   label: "Hover for submenu",
                   children: [
-                    { label: "Oh, god..." },
+                    {
+                      label: "More children",
+                      children: [
+                        {
+                          label: "Even MORE children",
+                          children: [
+                            { label: "Okay, that's all!" },
+                            { label: "Goodbye!" },
+                          ],
+                        },
+                      ],
+                    },
                     { label: "Nope." },
                     {
                       label: "Click here for another alert...",

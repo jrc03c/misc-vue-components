@@ -300,16 +300,17 @@
             this.$emit("select", item);
           },
           showChildren(event, item) {
+            this.hoveredItemWithChildren = null;
+            this.hoveredItemWithChildrenX = 0;
+            this.hoveredItemWithChildrenY = 0;
             if (item.children) {
-              this.hoveredItemWithChildren = item;
-              const rect = this.$refs.itemsContainer.getBoundingClientRect();
-              const targetRect = event.target.getBoundingClientRect();
-              this.hoveredItemWithChildrenX = this.x + rect.width;
-              this.hoveredItemWithChildrenY = this.y + targetRect.y - rect.y;
-            } else {
-              this.hoveredItemWithChildren = null;
-              this.hoveredItemWithChildrenX = 0;
-              this.hoveredItemWithChildrenY = 0;
+              this.$nextTick(() => {
+                const rect = this.$refs.itemsContainer.getBoundingClientRect();
+                const targetRect = event.target.getBoundingClientRect();
+                this.hoveredItemWithChildren = item;
+                this.hoveredItemWithChildrenX = rect.x + rect.width;
+                this.hoveredItemWithChildrenY = rect.y + targetRect.y - rect.y;
+              });
             }
           },
           async updateComputedStyle() {
@@ -331,13 +332,13 @@
                 x = parentMenuItemsRect.x - itemsRect.width;
               }
             }
+            if (y + itemsRect.height > window.innerHeight) {
+              y = window.innerHeight - itemsRect.height;
+            }
             this.computedStyle = `
         left: ${x}px;
         top: ${y}px;
       `;
-            this.hoveredItemWithChildren = null;
-            this.hoveredItemWithChildrenX = 0;
-            this.hoveredItemWithChildrenY = 0;
           }
         },
         mounted() {
