@@ -11,13 +11,17 @@ const css = /* css */ `
     font-size: 0.75rem;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.02s ease;
+  }
+
+  .x-context-menu:has(.x-context-menu-item.has-expanded-children)
+    > .x-context-menu-items
+    > .x-context-menu-item:not(.has-expanded-children) {
+    opacity: 0.25;
   }
 
   .x-context-menu.is-visible {
     pointer-events: all;
     opacity: 1;
-    transition: opacity 0.02s ease;
   }
 
   .x-context-menu .x-context-menu-item {
@@ -31,6 +35,11 @@ const css = /* css */ `
     cursor: pointer;
     padding: 0.5rem;
     user-select: none;
+    border-bottom: 2px solid rgb(215, 215, 215);
+  }
+
+  .x-context-menu .x-context-menu-item:last-child {
+    border-bottom: 0;
   }
 
   .x-context-menu .x-context-menu-item:hover,
@@ -58,7 +67,10 @@ const css = /* css */ `
 
 const template = /* html */ `
   <div
-    :class="{ 'is-visible': isVisible }"
+    :class="{
+      'has-open-submenu': !!hoveredItemWithChildren,
+      'is-visible': isVisible,
+    }"
     :style="computedStyle"
     @click.stop.prevent="() => {}"
     class="x-context-menu">
@@ -293,16 +305,12 @@ module.exports = createVueComponentWithCSS({
         left: ${x}px;
         top: ${y}px;
       `
-
-      // this.hoveredItemWithChildren = null
-      // this.hoveredItemWithChildrenX = 0
-      // this.hoveredItemWithChildrenY = 0
     },
   },
 
   mounted() {
     this.addListeners()
-    this.updateComputedStyle()
+    this.$nextTick(() => this.updateComputedStyle())
   },
 
   unmounted() {
