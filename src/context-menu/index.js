@@ -8,6 +8,7 @@ const css = /* css */ `
     background-color: rgb(235, 235, 235);
     position: fixed;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    font-size: 0.85rem;
   }
 
   .x-context-menu .x-context-menu-item {
