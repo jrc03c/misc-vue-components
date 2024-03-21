@@ -127,7 +127,6 @@
         :key="item.label"
         @click="select(item)"
         @mouseenter="showChildren($event, item)"
-        @mouseleave="hideChildren(item)"
         class="x-context-menu-item"
         v-for="item in items">
         <span class="x-context-menu-item-label">
@@ -231,8 +230,6 @@
             window.addEventListener("click", this.onClick);
             window.addEventListener("keydown", this.onKeyDown);
             this.listenersHaveBeenAdded = true;
-          },
-          hideChildren(item) {
           },
           onClick() {
             this.$emit("cancel");
