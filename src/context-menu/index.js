@@ -59,7 +59,7 @@ const template = /* html */ `
         :key="item.label"
         @click="select(item)"
         @mouseenter="showChildren($event, item)"
-        @mouseleave="hideChildren()"
+        @mouseleave="hideChildren(item)"
         class="x-context-menu-item"
         v-for="item in items">
         <span class="x-context-menu-item-label">
@@ -180,7 +180,7 @@ module.exports = createVueComponentWithCSS({
       this.listenersHaveBeenAdded = true
     },
 
-    hideChildren() {
+    hideChildren(item) {
       // this.hoveredItemWithChildren = null
     },
 
@@ -221,6 +221,10 @@ module.exports = createVueComponentWithCSS({
           this.x + this.$refs.itemsContainer.getBoundingClientRect().width
 
         this.hoveredItemWithChildrenY = event.target.getBoundingClientRect().y
+      } else {
+        this.hoveredItemWithChildren = null
+        this.hoveredItemWithChildrenX = 0
+        this.hoveredItemWithChildrenY = 0
       }
     },
 

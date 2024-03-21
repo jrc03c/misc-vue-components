@@ -127,7 +127,7 @@
         :key="item.label"
         @click="select(item)"
         @mouseenter="showChildren($event, item)"
-        @mouseleave="hideChildren()"
+        @mouseleave="hideChildren(item)"
         class="x-context-menu-item"
         v-for="item in items">
         <span class="x-context-menu-item-label">
@@ -232,7 +232,7 @@
             window.addEventListener("keydown", this.onKeyDown);
             this.listenersHaveBeenAdded = true;
           },
-          hideChildren() {
+          hideChildren(item) {
           },
           onClick() {
             this.$emit("cancel");
@@ -263,6 +263,10 @@
               this.hoveredItemWithChildren = item;
               this.hoveredItemWithChildrenX = this.x + this.$refs.itemsContainer.getBoundingClientRect().width;
               this.hoveredItemWithChildrenY = event.target.getBoundingClientRect().y;
+            } else {
+              this.hoveredItemWithChildren = null;
+              this.hoveredItemWithChildrenX = 0;
+              this.hoveredItemWithChildrenY = 0;
             }
           },
           updateComputedStyle() {
