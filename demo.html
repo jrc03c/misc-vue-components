@@ -143,7 +143,10 @@
           </button>
         </h2>
 
-        <div @contextmenu.stop.prevent="showContextMenu" class="demo">
+        <div
+          :style="'background-color: ' +  contextMenuDemoBackgroundColor"
+          @contextmenu.stop.prevent="showContextMenu"
+          class="demo">
           <x-context-menu
             :is-visible="contextMenuIsVisible"
             :items="contextMenuItems"
@@ -328,11 +331,20 @@
 
           data() {
             return {
+              contextMenuDemoBackgroundColor: "hsl(225deg, 100%, 85%)",
               contextMenuIsVisible: false,
               contextMenuItems: [
-                { label: "Hello!" },
-                { label: "Click me..." },
-                { label: "I have children", children: [] },
+                {
+                  label: "Show an alert",
+                  action: () => alert("You have been alerted!"),
+                },
+                {
+                  label: "Change background color",
+                  action: () => {
+                    this.contextMenuDemoBackgroundColor = `hsl(${Math.random() * 360}deg, 100%, 85%)`
+                  },
+                },
+                { label: "Hover for submenu", children: [] },
               ],
               contextMenuSectionIsExpanded: true,
               contextMenuX: 0,
