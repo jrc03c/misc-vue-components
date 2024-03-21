@@ -11,13 +11,13 @@ const css = /* css */ `
     font-size: 0.75rem;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.1s ease;
+    transition: opacity 0.02s ease;
   }
 
   .x-context-menu.is-visible {
     pointer-events: all;
     opacity: 1;
-    transition: opacity 0.1s ease;
+    transition: opacity 0.02s ease;
   }
 
   .x-context-menu .x-context-menu-item {
