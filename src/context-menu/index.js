@@ -236,6 +236,10 @@ module.exports = createVueComponentWithCSS({
         left: ${this.x}px;
         top: ${this.y}px;
       `
+
+      this.hoveredItemWithChildren = null
+      this.hoveredItemWithChildrenX = 0
+      this.hoveredItemWithChildrenY = 0
     },
   },
 
