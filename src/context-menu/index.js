@@ -13,6 +13,10 @@ const css = /* css */ `
     opacity: 0;
   }
 
+  .x-context-menu .x-context-menu-items {
+    min-width: 192px;
+  }
+
   .x-context-menu:has(.x-context-menu-item.has-expanded-children)
     > .x-context-menu-items
     > .x-context-menu-item:not(.has-expanded-children) {
@@ -268,7 +272,11 @@ module.exports = createVueComponentWithCSS({
       }
     },
 
-    async updateComputedStyle() {
+    async updateComputedStyle(shouldCallAgain) {
+      if (typeof shouldCallAgain === "undefined") {
+        shouldCallAgain = true
+      }
+
       while (!this.$refs.itemsContainer) {
         await pause(10)
       }
@@ -305,6 +313,12 @@ module.exports = createVueComponentWithCSS({
         left: ${x}px;
         top: ${y}px;
       `
+
+      if (shouldCallAgain) {
+        this.$nextTick(() => {
+          this.updateComputedStyle(false)
+        })
+      }
     },
   },
 
