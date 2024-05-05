@@ -15,7 +15,7 @@ npm install --save @jrc03c/misc-vue-components
 **With bundlers:**
 
 ```js
-const { Draggable, Framee, Resizeable } = require("@jrc03c/misc-vue-components")
+const { Draggable, Frame, Resizeable } = require("@jrc03c/misc-vue-components")
 ```
 
 **Without bundlers:**
