@@ -15,7 +15,12 @@ npm install --save @jrc03c/misc-vue-components
 **With bundlers:**
 
 ```js
-const { Draggable, Frame, Resizeable } = require("@jrc03c/misc-vue-components")
+const {
+  ContextMenu,
+  Draggable,
+  Frame,
+  Resizeable,
+} = require("@jrc03c/misc-vue-components")
 ```
 
 **Without bundlers:**
@@ -29,7 +34,7 @@ Add the script to your HTML:
 And then in your JS:
 
 ```js
-const { Draggable, Frame, Resizeable } = MiscVueComponents
+const { ContextMenu, Draggable, Frame, Resizeable } = MiscVueComponents
 ```
 
 ## Add to a Vue app or component
@@ -39,6 +44,7 @@ const MyComponent = {
   name: "x-my-component",
 
   components: {
+    "x-context-menu": ContextMenu,
     "x-draggable": Draggable,
     "x-frame": Frame,
     "x-resizeable": Resizeable,
@@ -47,6 +53,50 @@ const MyComponent = {
 ```
 
 # API
+
+## `ContextMenu`
+
+![](https://i.ibb.co/nwTX61v/context-menu.gif)
+
+### Props
+
+#### `is-visible`
+
+(Required) A boolean indicating whether or not the menu should be visible.
+
+#### `items`
+
+(Required) An array of objects, each of which has the following properties:
+
+- `"label"` = the text label of the context menu item (e.g., "Copy", "Paste", "Undo", etc.)
+- `"action"` = a callback function to be called when the context menu item is selected; this value is required if `"children"` is not defined
+- `"children"` = an array of menu items with this same interface; required if `"action"` is not defined
+
+#### `x`
+
+(Required) A number representing the x-coordinate in pixels of the top-left corner of the context menu; note that this only applies to the "root" menu; descendant menus are dynamically placed relative to viewport edges
+
+#### `y`
+
+(Required) A number representing the y-coordinate in pixels of the top-left corner of the context menu; note that this only applies to the "root" menu; descendant menus are dynamically placed relative to viewport edges
+
+### Events
+
+#### `"cancel"`
+
+Is emitted when the user does not select a menu item and indicates that they want the menu to close.
+
+#### `"close"`
+
+Is emitted when the menu closes.
+
+#### `"open"`
+
+Is emitted when the menu opens (i.e., when it becomes visible).
+
+#### `"select"`
+
+Is emitted when a particular menu item has been selected. The particular menu item that was selected will be passed to event handlers.
 
 ## `Draggable`
 
