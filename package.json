@@ -1,6 +1,6 @@
 {
   "name": "@jrc03c/misc-vue-components",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "main": "src/index.js",
   "dependencies": {
     "@jrc03c/pause": "^0.0.3",
