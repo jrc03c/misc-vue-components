@@ -10,7 +10,7 @@ const css = /* css */ ``
 
 const template = /* html */ `
   <div class="x-jack">
-    This is a jack with ID: {{ jack.id }}
+    This is a jack with ID: {{ id }}
   </div>
 `
 
@@ -21,24 +21,15 @@ const template = /* html */ `
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 const makeKey = require("@jrc03c/make-key")
 
-class JackClass {
-  id = null
-
-  constructor(data) {
-    data = data || {}
-    this.id = data.id || makeKey(8)
-  }
-}
-
-const component = createVueComponentWithCSS({
+module.exports = createVueComponentWithCSS({
   name: "x-jack",
   template,
 
   props: {
-    jack: {
-      type: JackClass,
-      required: true,
-      default: () => null,
+    id: {
+      type: String,
+      false: true,
+      default: () => makeKey(8),
     },
   },
 
@@ -48,5 +39,3 @@ const component = createVueComponentWithCSS({
     }
   },
 })
-
-module.exports = { class: JackClass, component }

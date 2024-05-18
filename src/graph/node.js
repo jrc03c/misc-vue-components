@@ -9,10 +9,17 @@ const css = /* css */ ``
 // -----------------------------------------------------------------------------
 
 const template = /* html */ `
-  <x-draggable :x="node.x" :y="node.y" class="x-node">
-    This is a node with ID: {{ node.id }}
-
-    <x-jack :jack="jack" :key="jack.id" v-for="jack in node.jacks"></x-jack>
+  <x-draggable
+    :is-h-locked="isHLocked"
+    :is-v-locked="isVLocked"
+    :x="x"
+    :y="y"
+    @drag-end="$emit('drag-end', $event)"
+    @drag-start="$emit('drag-start', $event)"
+    @drag="$emit('drag', $event)"
+    class="x-node">
+    This is a node with ID: {{ id }}
+    <x-jack :id="jack.id" :key="jack.id" v-for="jack in jacks"></x-jack>
   </x-draggable>
 `
 
@@ -22,38 +29,32 @@ const template = /* html */ `
 
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 const DraggableComponent = require("../draggable")
-const Jack = require("./jack")
+const JackComponent = require("./jack")
 const makeKey = require("@jrc03c/make-key")
 
-class NodeClass {
-  id = null
-  jacks = []
-  x = 0
-  y = 0
-
-  constructor(data) {
-    data = data || {}
-    this.id = data.id || makeKey(8)
-    this.jacks = data.jacks ? data.jacks.map(j => new Jack.class(j)) : []
-    this.x = data.x || 0
-    this.y = data.y || 0
-  }
-}
-
-const component = createVueComponentWithCSS({
+module.exports = createVueComponentWithCSS({
   name: "x-node",
   template,
+  emits: [...DraggableComponent.emits],
 
   components: {
     "x-draggable": DraggableComponent,
-    "x-jack": Jack.component,
+    "x-jack": JackComponent,
   },
 
   props: {
-    node: {
-      type: NodeClass,
-      required: true,
-      default: () => null,
+    ...DraggableComponent.props,
+
+    id: {
+      type: String,
+      required: false,
+      default: () => makeKey(8),
+    },
+
+    jacks: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
 
@@ -63,5 +64,3 @@ const component = createVueComponentWithCSS({
     }
   },
 })
-
-module.exports = { class: NodeClass, component, Jack }

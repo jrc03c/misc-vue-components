@@ -11,8 +11,23 @@ const css = /* css */ ``
 const template = /* html */ `
   <div class="x-graph">
     <p>This is a graph!</p>
-    <x-node :key="node.id" :node="node" v-for="node in graph.nodes"></x-node>
-    <x-edge :key="edge.id" :edge="edge" v-for="edge in graph.edges"></x-edge>
+
+    <x-node
+      :id="node.id"
+      :jacks="node.jacks"
+      :key="node.id"
+      :x="node.x"
+      :y="node.y"
+      v-for="node in nodes">
+    </x-node>
+    
+    <x-edge
+      :id="edge.id"
+      :input-jack="edge.inputJack"
+      :key="edge.id"
+      :output-jack="edge.outputJack"
+      v-for="edge in edges">
+    </x-edge>
   </div>
 `
 
@@ -21,34 +36,29 @@ const template = /* html */ `
 // -----------------------------------------------------------------------------
 
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
-const Edge = require("./edge")
-const Node = require("./node")
+const EdgeComponent = require("./edge")
+const NodeComponent = require("./node")
 
-class GraphClass {
-  edges = []
-  nodes = []
-
-  constructor(data) {
-    data = data || {}
-    this.edges = data.edges ? data.edges.map(e => new Edge.class(e)) : []
-    this.nodes = data.nodes ? data.nodes.map(n => new Node.class(n)) : []
-  }
-}
-
-const component = createVueComponentWithCSS({
+module.exports = createVueComponentWithCSS({
   name: "x-graph",
   template,
 
   components: {
-    "x-edge": Edge.component,
-    "x-node": Node.component,
+    "x-edge": EdgeComponent,
+    "x-node": NodeComponent,
   },
 
   props: {
-    graph: {
-      type: GraphClass,
-      required: true,
-      default: () => null,
+    edges: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+
+    nodes: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
 
@@ -58,5 +68,3 @@ const component = createVueComponentWithCSS({
     }
   },
 })
-
-module.exports = { class: GraphClass, component, Edge, Node }

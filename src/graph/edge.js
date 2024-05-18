@@ -10,7 +10,7 @@ const css = /* css */ ``
 
 const template = /* html */ `
   <div class="x-edge">
-    This is an edge with ID: {{ edge.id }}
+    This is an edge with ID: {{ id }}
   </div>
 `
 
@@ -21,22 +21,25 @@ const template = /* html */ `
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 const makeKey = require("@jrc03c/make-key")
 
-class EdgeClass {
-  id = null
-
-  constructor(data) {
-    data = data || {}
-    this.id = data.id || makeKey(8)
-  }
-}
-
-const component = createVueComponentWithCSS({
+module.exports = createVueComponentWithCSS({
   name: "x-edge",
   template,
 
   props: {
-    edge: {
-      type: EdgeClass,
+    id: {
+      type: String,
+      required: false,
+      default: () => makeKey(8),
+    },
+
+    "input-jack": {
+      type: Object,
+      required: true,
+      default: () => null,
+    },
+
+    "output-jack": {
+      type: Object,
       required: true,
       default: () => null,
     },
@@ -48,5 +51,3 @@ const component = createVueComponentWithCSS({
     }
   },
 })
-
-module.exports = { class: EdgeClass, component }

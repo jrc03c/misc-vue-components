@@ -3,10 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <style>
+      .x-graph {
+        width: 800;
+        height: 600;
+        border: 1px solid black;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
-      <x-graph :graph="graph"></x-graph>
+      <x-graph :edges="edges" :nodes="nodes"></x-graph>
     </div>
 
     <script src="node_modules/vue/dist/vue.global.prod.js"></script>
@@ -14,33 +21,29 @@
     <script>
       const { createApp } = Vue
 
-      const graph = new MiscVueComponents.Graph.class()
-
-      const n1 = new MiscVueComponents.Graph.Node.class({ x: 256, y: 256 })
-      const n2 = new MiscVueComponents.Graph.Node.class({
-        x: 256 + 32,
-        y: 256 + 32,
-      })
-      const n3 = new MiscVueComponents.Graph.Node.class({
-        x: 256 + 64,
-        y: 256 + 64,
-      })
-
-      graph.nodes.push(n1)
-      graph.nodes.push(n2)
-      graph.nodes.push(n3)
-
-      graph.edges.push(new MiscVueComponents.Graph.Edge.class())
-      graph.edges.push(new MiscVueComponents.Graph.Edge.class())
-
       const app = createApp({
         components: {
-          "x-graph": MiscVueComponents.Graph.component,
+          "x-graph": MiscVueComponents.Graph,
         },
 
         data() {
           return {
-            graph,
+            edges: [{}, {}],
+
+            nodes: [
+              {
+                x: 256,
+                y: 256,
+              },
+              {
+                x: 256 + 32,
+                y: 256 + 32,
+              },
+              {
+                x: 256 + 64,
+                y: 256 + 64,
+              },
+            ],
           }
         },
       })

@@ -7012,25 +7012,28 @@
         /* html */
         `
   <div class="x-edge">
-    This is an edge with ID: {{ edge.id }}
+    This is an edge with ID: {{ id }}
   </div>
 `
       );
       var createVueComponentWithCSS = require_src();
       var makeKey = require_src3();
-      var EdgeClass = class {
-        id = null;
-        constructor(data) {
-          data = data || {};
-          this.id = data.id || makeKey(8);
-        }
-      };
-      var component = createVueComponentWithCSS({
+      module.exports = createVueComponentWithCSS({
         name: "x-edge",
         template,
         props: {
-          edge: {
-            type: EdgeClass,
+          id: {
+            type: String,
+            required: false,
+            default: () => makeKey(8)
+          },
+          "input-jack": {
+            type: Object,
+            required: true,
+            default: () => null
+          },
+          "output-jack": {
+            type: Object,
             required: true,
             default: () => null
           }
@@ -7041,7 +7044,6 @@
           };
         }
       });
-      module.exports = { class: EdgeClass, component };
     }
   });
 
@@ -7056,27 +7058,20 @@
         /* html */
         `
   <div class="x-jack">
-    This is a jack with ID: {{ jack.id }}
+    This is a jack with ID: {{ id }}
   </div>
 `
       );
       var createVueComponentWithCSS = require_src();
       var makeKey = require_src3();
-      var JackClass = class {
-        id = null;
-        constructor(data) {
-          data = data || {};
-          this.id = data.id || makeKey(8);
-        }
-      };
-      var component = createVueComponentWithCSS({
+      module.exports = createVueComponentWithCSS({
         name: "x-jack",
         template,
         props: {
-          jack: {
-            type: JackClass,
-            required: true,
-            default: () => null
+          id: {
+            type: String,
+            false: true,
+            default: () => makeKey(8)
           }
         },
         data() {
@@ -7085,7 +7080,6 @@
           };
         }
       });
-      module.exports = { class: JackClass, component };
     }
   });
 
@@ -7099,42 +7093,43 @@
       var template = (
         /* html */
         `
-  <x-draggable :x="node.x" :y="node.y" class="x-node">
-    This is a node with ID: {{ node.id }}
-
-    <x-jack :jack="jack" :key="jack.id" v-for="jack in node.jacks"></x-jack>
+  <x-draggable
+    :is-h-locked="isHLocked"
+    :is-v-locked="isVLocked"
+    :x="x"
+    :y="y"
+    @drag-end="$emit('drag-end', $event)"
+    @drag-start="$emit('drag-start', $event)"
+    @drag="$emit('drag', $event)"
+    class="x-node">
+    This is a node with ID: {{ id }}
+    <x-jack :id="jack.id" :key="jack.id" v-for="jack in jacks"></x-jack>
   </x-draggable>
 `
       );
       var createVueComponentWithCSS = require_src();
       var DraggableComponent = require_draggable();
-      var Jack = require_jack();
+      var JackComponent = require_jack();
       var makeKey = require_src3();
-      var NodeClass = class {
-        id = null;
-        jacks = [];
-        x = 0;
-        y = 0;
-        constructor(data) {
-          data = data || {};
-          this.id = data.id || makeKey(8);
-          this.jacks = data.jacks ? data.jacks.map((j) => new Jack.class(j)) : [];
-          this.x = data.x || 0;
-          this.y = data.y || 0;
-        }
-      };
-      var component = createVueComponentWithCSS({
+      module.exports = createVueComponentWithCSS({
         name: "x-node",
         template,
+        emits: [...DraggableComponent.emits],
         components: {
           "x-draggable": DraggableComponent,
-          "x-jack": Jack.component
+          "x-jack": JackComponent
         },
         props: {
-          node: {
-            type: NodeClass,
-            required: true,
-            default: () => null
+          ...DraggableComponent.props,
+          id: {
+            type: String,
+            required: false,
+            default: () => makeKey(8)
+          },
+          jacks: {
+            type: Array,
+            required: false,
+            default: () => []
           }
         },
         data() {
@@ -7143,7 +7138,6 @@
           };
         }
       });
-      module.exports = { class: NodeClass, component, Jack };
     }
   });
 
@@ -7159,35 +7153,46 @@
         `
   <div class="x-graph">
     <p>This is a graph!</p>
-    <x-node :key="node.id" :node="node" v-for="node in graph.nodes"></x-node>
-    <x-edge :key="edge.id" :edge="edge" v-for="edge in graph.edges"></x-edge>
+
+    <x-node
+      :id="node.id"
+      :jacks="node.jacks"
+      :key="node.id"
+      :x="node.x"
+      :y="node.y"
+      v-for="node in nodes">
+    </x-node>
+    
+    <x-edge
+      :id="edge.id"
+      :input-jack="edge.inputJack"
+      :key="edge.id"
+      :output-jack="edge.outputJack"
+      v-for="edge in edges">
+    </x-edge>
   </div>
 `
       );
       var createVueComponentWithCSS = require_src();
-      var Edge = require_edge();
-      var Node = require_node();
-      var GraphClass = class {
-        edges = [];
-        nodes = [];
-        constructor(data) {
-          data = data || {};
-          this.edges = data.edges ? data.edges.map((e) => new Edge.class(e)) : [];
-          this.nodes = data.nodes ? data.nodes.map((n) => new Node.class(n)) : [];
-        }
-      };
-      var component = createVueComponentWithCSS({
+      var EdgeComponent = require_edge();
+      var NodeComponent = require_node();
+      module.exports = createVueComponentWithCSS({
         name: "x-graph",
         template,
         components: {
-          "x-edge": Edge.component,
-          "x-node": Node.component
+          "x-edge": EdgeComponent,
+          "x-node": NodeComponent
         },
         props: {
-          graph: {
-            type: GraphClass,
-            required: true,
-            default: () => null
+          edges: {
+            type: Array,
+            required: false,
+            default: () => []
+          },
+          nodes: {
+            type: Array,
+            required: false,
+            default: () => []
           }
         },
         data() {
@@ -7196,7 +7201,6 @@
           };
         }
       });
-      module.exports = { class: GraphClass, component, Edge, Node };
     }
   });
 
