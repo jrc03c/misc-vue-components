@@ -8,16 +8,28 @@
         width: 800px;
         height: 600px;
         border: 1px solid black;
-        overflow: scroll;
+      }
+
+      .x-node {
+        width: 128px;
+        height: 256px;
+        padding: 1em;
+        border: 1px solid black;
+        background-color: rgb(235, 235, 235);
       }
     </style>
   </head>
   <body>
     <div id="app">
-      <x-graph :edges="edges" :nodes="nodes"></x-graph>
+      <x-graph
+        :edges="edges"
+        :nodes="nodes"
+        @move-node-to-top="onMoveNodeToTop">
+      </x-graph>
     </div>
 
     <script src="node_modules/vue/dist/vue.global.prod.js"></script>
+    <script src="node_modules/@jrc03c/make-key/dist/make-key.js"></script>
     <script src="dist/misc-vue-components.js"></script>
     <script>
       const { createApp } = Vue
@@ -33,19 +45,29 @@
 
             nodes: [
               {
+                id: makeKey(8),
                 x: 256,
                 y: 256,
               },
               {
+                id: makeKey(8),
                 x: 256 + 32,
                 y: 256 + 32,
               },
               {
+                id: makeKey(8),
                 x: 256 + 64,
                 y: 256 + 64,
               },
             ],
           }
+        },
+
+        methods: {
+          onMoveNodeToTop(node) {
+            this.nodes.splice(this.nodes.indexOf(node), 1)
+            this.nodes.push(node)
+          },
         },
       })
 

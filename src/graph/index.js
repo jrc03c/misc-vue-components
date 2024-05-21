@@ -23,6 +23,7 @@ const template = /* html */ `
       :key="node.id"
       :x="node.x"
       :y="node.y"
+      @mousedown="$emit('move-node-to-top', node)"
       v-for="node in nodes">
     </x-node>
     
@@ -47,6 +48,7 @@ const NodeComponent = require("./node")
 module.exports = createVueComponentWithCSS({
   name: "x-graph",
   template,
+  emits: ["move-node-to-top"],
 
   components: {
     "x-edge": EdgeComponent,
