@@ -13,7 +13,7 @@ const css = /* css */ `
     cursor: grab;
   }
 
-  .x-draggable.has-grab-cursor:active {
+  .x-draggable.has-grab-cursor.is-being-dragged {
     cursor: grabbing;
   }
 
@@ -29,7 +29,10 @@ const css = /* css */ `
 
 const template = /* html */ `
   <div
-    :class="{ 'has-grab-cursor': !isHLocked || !isVLocked }"
+    :class="{
+      'has-grab-cursor': !isHLocked || !isVLocked,
+      'is-being-dragged': isBeingDragged,
+    }"
     @mousedown="onMouseDown"
     class="x-draggable">
     <slot></slot>
