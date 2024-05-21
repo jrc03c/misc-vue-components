@@ -7157,8 +7157,6 @@
         /* html */
         `
   <div class="x-graph">
-    <p>This is a graph!</p>
-
     <x-node
       :id="node.id"
       :jacks="node.jacks"
