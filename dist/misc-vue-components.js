@@ -7146,7 +7146,12 @@
     "src/graph/index.js"(exports, module) {
       var css = (
         /* css */
-        ``
+        `
+  .x-graph {
+    overflow: hidden;
+    position: absolute;
+  }
+`
       );
       var template = (
         /* html */
