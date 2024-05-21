@@ -7088,7 +7088,14 @@
     "src/graph/node.js"(exports, module) {
       var css = (
         /* css */
-        ``
+        `
+  .x-node {
+    width: 128px;
+    padding: 1em;
+    border: 1px solid black;
+    background-color: rgb(235, 235, 235);
+  }
+`
       );
       var template = (
         /* html */
