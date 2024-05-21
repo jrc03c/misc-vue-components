@@ -38,23 +38,15 @@
             nodes: [
               {
                 id: makeKey(8),
-                x: 32,
-                y: 32,
+                x: 64,
+                y: 64,
+                jacks: [{ id: makeKey(8), title: "a", type: "output" }],
               },
               {
                 id: makeKey(8),
-                x: 64 * 3 + 32,
-                y: 32 * 4,
-              },
-              {
-                id: makeKey(8),
-                x: 64 * 6 + 32,
-                y: 32 * 7,
-                jacks: [
-                  { id: makeKey(8), title: "x", type: "input" },
-                  { id: makeKey(8), title: "y", type: "input" },
-                  { id: makeKey(8), title: "z", type: "output" },
-                ],
+                x: 512,
+                y: 64,
+                jacks: [{ id: makeKey(8), title: "b", type: "input" }],
               },
             ],
           }
