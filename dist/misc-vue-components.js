@@ -7057,11 +7057,8 @@
         /* css */
         `
   .x-jack {
-    background-color: rgb(215, 215, 215);
     position: relative;
     width: 100%;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
   }
 
   .x-jack .x-jack-hole {
@@ -7074,7 +7071,6 @@
     top: calc(50% - 0.5em);
     left: -0.5em;
     background-color: blue;
-    border: 1px solid black;
     cursor: pointer !important;
   }
 
@@ -7095,6 +7091,16 @@
   .x-jack .x-jack-title {
     padding: 0.5em;
     text-align: center;
+  }
+
+  .x-jack.x-input-jack .x-jack-title {
+    text-align: left;
+    padding-left: 1em;
+  }
+
+  .x-jack.x-output-jack .x-jack-title {
+    text-align: right;
+    padding-right: 1em;
   }
 `
       );
@@ -7169,6 +7175,22 @@
   .x-node-body {
     padding: 0.5em;
   }
+
+  .x-node-jacks {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: flex-start;
+    border-top: 1px solid black;
+    background-color: rgb(215, 215, 215);
+  }
+
+  .x-node-jacks-inputs,
+  .x-node-jacks-outputs {
+    width: 50%;
+  }
 `
       );
       var template = (
@@ -7194,14 +7216,26 @@
       <slot></slot>
     </div>
 
-    <div class="x-node-jacks">
-      <x-jack
-        :id="jack.id"
-        :key="jack.id"
-        :title="jack.title"
-        :type="jack.type"
-        v-for="jack in jacks">
-      </x-jack>
+    <div class="x-node-jacks" v-if="jacks.length > 0">
+      <div class="x-node-jacks-inputs">
+        <x-jack
+          :id="jack.id"
+          :key="jack.id"
+          :title="jack.title"
+          :type="jack.type"
+          v-for="jack in inputJacks">
+        </x-jack>
+      </div>
+
+      <div class="x-node-jacks-outputs">
+        <x-jack
+          :id="jack.id"
+          :key="jack.id"
+          :title="jack.title"
+          :type="jack.type"
+          v-for="jack in outputJacks">
+        </x-jack>
+      </div>
     </div>
   </x-draggable>
 `
@@ -7240,6 +7274,14 @@
           return {
             css
           };
+        },
+        computed: {
+          inputJacks() {
+            return this.jacks.filter((jack) => jack.type === "input");
+          },
+          outputJacks() {
+            return this.jacks.filter((jack) => jack.type === "output");
+          }
         }
       });
     }

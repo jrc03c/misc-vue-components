@@ -4,11 +4,8 @@
 
 const css = /* css */ `
   .x-jack {
-    background-color: rgb(215, 215, 215);
     position: relative;
     width: 100%;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
   }
 
   .x-jack .x-jack-hole {
@@ -21,7 +18,6 @@ const css = /* css */ `
     top: calc(50% - 0.5em);
     left: -0.5em;
     background-color: blue;
-    border: 1px solid black;
     cursor: pointer !important;
   }
 
@@ -42,6 +38,16 @@ const css = /* css */ `
   .x-jack .x-jack-title {
     padding: 0.5em;
     text-align: center;
+  }
+
+  .x-jack.x-input-jack .x-jack-title {
+    text-align: left;
+    padding-left: 1em;
+  }
+
+  .x-jack.x-output-jack .x-jack-title {
+    text-align: right;
+    padding-right: 1em;
   }
 `
 

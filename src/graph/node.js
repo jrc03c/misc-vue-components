@@ -18,6 +18,22 @@ const css = /* css */ `
   .x-node-body {
     padding: 0.5em;
   }
+
+  .x-node-jacks {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    align-items: flex-start;
+    border-top: 1px solid black;
+    background-color: rgb(215, 215, 215);
+  }
+
+  .x-node-jacks-inputs,
+  .x-node-jacks-outputs {
+    width: 50%;
+  }
 `
 
 // -----------------------------------------------------------------------------
@@ -45,14 +61,26 @@ const template = /* html */ `
       <slot></slot>
     </div>
 
-    <div class="x-node-jacks">
-      <x-jack
-        :id="jack.id"
-        :key="jack.id"
-        :title="jack.title"
-        :type="jack.type"
-        v-for="jack in jacks">
-      </x-jack>
+    <div class="x-node-jacks" v-if="jacks.length > 0">
+      <div class="x-node-jacks-inputs">
+        <x-jack
+          :id="jack.id"
+          :key="jack.id"
+          :title="jack.title"
+          :type="jack.type"
+          v-for="jack in inputJacks">
+        </x-jack>
+      </div>
+
+      <div class="x-node-jacks-outputs">
+        <x-jack
+          :id="jack.id"
+          :key="jack.id"
+          :title="jack.title"
+          :type="jack.type"
+          v-for="jack in outputJacks">
+        </x-jack>
+      </div>
     </div>
   </x-draggable>
 `
@@ -102,5 +130,15 @@ module.exports = createVueComponentWithCSS({
     return {
       css,
     }
+  },
+
+  computed: {
+    inputJacks() {
+      return this.jacks.filter(jack => jack.type === "input")
+    },
+
+    outputJacks() {
+      return this.jacks.filter(jack => jack.type === "output")
+    },
   },
 })
