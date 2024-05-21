@@ -4,7 +4,7 @@
 
 const css = /* css */ `
   .x-node {
-    width: 128px;
+    width: 192px;
     border: 1px solid black;
     background-color: rgb(235, 235, 235);
   }
@@ -46,7 +46,13 @@ const template = /* html */ `
     </div>
 
     <div class="x-node-jacks">
-      <x-jack :id="jack.id" :key="jack.id" v-for="jack in jacks"></x-jack>
+      <x-jack
+        :id="jack.id"
+        :key="jack.id"
+        :title="jack.title"
+        :type="jack.type"
+        v-for="jack in jacks">
+      </x-jack>
     </div>
   </x-draggable>
 `

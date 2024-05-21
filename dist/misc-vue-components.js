@@ -7055,13 +7055,63 @@
     "src/graph/jack.js"(exports, module) {
       var css = (
         /* css */
-        ``
+        `
+  .x-jack {
+    background-color: rgb(215, 215, 215);
+    position: relative;
+    width: 100%;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+
+  .x-jack .x-jack-hole {
+    display: none;
+    width: 1em;
+    height: 1em;
+    box-sizing: border-box;
+    border-radius: 100%;
+    position: absolute;
+    top: calc(50% - 0.5em);
+    left: -0.5em;
+    background-color: blue;
+    border: 1px solid black;
+    cursor: pointer !important;
+  }
+
+  .x-jack .x-jack-hole:hover {
+    background-color: hsl(225deg, 100%, 75%);
+  }
+
+  .x-jack.x-input-jack .x-jack-hole {
+    display: block;
+  }
+
+  .x-jack.x-output-jack .x-jack-hole {
+    display: block;
+    left: unset;
+    right: -0.5em;
+  }
+
+  .x-jack .x-jack-title {
+    padding: 0.5em;
+    text-align: center;
+  }
+`
       );
       var template = (
         /* html */
         `
-  <div class="x-jack">
-    This is a jack with ID: {{ id }}
+  <div
+    :class="{
+      'x-input-jack': type === 'input',
+      'x-output-jack': type === 'output'
+    }"
+    class="x-jack">
+    <div class="x-jack-hole"></div>
+
+    <div class="x-jack-title">
+      {{ title }}
+    </div>
   </div>
 `
       );
@@ -7070,11 +7120,23 @@
       module.exports = createVueComponentWithCSS({
         name: "x-jack",
         template,
+        emits: ["connect", "disconnect"],
         props: {
           id: {
             type: String,
-            false: true,
+            false: false,
             default: () => makeKey(8)
+          },
+          title: {
+            type: String,
+            required: true,
+            default: () => "input jack"
+          },
+          type: {
+            type: String,
+            required: true,
+            default: () => "input"
+            // or "output"
           }
         },
         data() {
@@ -7093,7 +7155,7 @@
         /* css */
         `
   .x-node {
-    width: 128px;
+    width: 192px;
     border: 1px solid black;
     background-color: rgb(235, 235, 235);
   }
@@ -7133,7 +7195,13 @@
     </div>
 
     <div class="x-node-jacks">
-      <x-jack :id="jack.id" :key="jack.id" v-for="jack in jacks"></x-jack>
+      <x-jack
+        :id="jack.id"
+        :key="jack.id"
+        :title="jack.title"
+        :type="jack.type"
+        v-for="jack in jacks">
+      </x-jack>
     </div>
   </x-draggable>
 `
