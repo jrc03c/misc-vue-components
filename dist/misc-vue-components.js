@@ -1110,6 +1110,31 @@
     }
   });
 
+  // node_modules/@jrc03c/create-high-dpi-canvas/create-high-dpi-canvas.js
+  var require_create_high_dpi_canvas = __commonJS({
+    "node_modules/@jrc03c/create-high-dpi-canvas/create-high-dpi-canvas.js"(exports, module) {
+      function createHighDPICanvas(width, height) {
+        width = Math.floor(width);
+        height = Math.floor(height);
+        let dpi = window.devicePixelRatio || 1;
+        let canvas = document.createElement("canvas");
+        canvas.width = Math.floor(width * dpi);
+        canvas.height = Math.floor(height * dpi);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        let context = canvas.getContext("2d");
+        context.scale(dpi, dpi);
+        return canvas;
+      }
+      if (typeof window !== "undefined") {
+        window.createHighDPICanvas = createHighDPICanvas;
+      }
+      if (typeof module !== "undefined") {
+        module.exports = createHighDPICanvas;
+      }
+    }
+  });
+
   // node_modules/@jrc03c/js-math-tools/src/math-error.js
   var require_math_error = __commonJS({
     "node_modules/@jrc03c/js-math-tools/src/math-error.js"(exports, module) {
@@ -7296,6 +7321,17 @@
   .x-graph {
     overflow: hidden;
     position: absolute;
+    width: 50vw !important;
+    height: 50vh !important;
+  }
+
+  .x-graph canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 `
       );
@@ -7312,17 +7348,10 @@
       @mousedown="$emit('move-node-to-top', node)"
       v-for="node in nodes">
     </x-node>
-    
-    <x-edge
-      :id="edge.id"
-      :input-jack="edge.inputJack"
-      :key="edge.id"
-      :output-jack="edge.outputJack"
-      v-for="edge in edges">
-    </x-edge>
   </div>
 `
       );
+      var createHighDPICanvas = require_create_high_dpi_canvas();
       var createVueComponentWithCSS = require_src();
       var EdgeComponent = require_edge();
       var NodeComponent = require_node();
@@ -7348,8 +7377,58 @@
         },
         data() {
           return {
-            css
+            canvas: null,
+            css,
+            mouse: { x: 0, y: 0 },
+            resizeObserver: null
           };
+        },
+        methods: {
+          drawEdges() {
+            const { canvas } = this;
+            const { width, height } = canvas;
+            const context = canvas.getContext("2d");
+            context.clearRect(0, 0, width, height);
+            context.fillStyle = "red";
+            context.beginPath();
+            context.arc(this.mouse.x, this.mouse.y, 32, 0, Math.PI * 2);
+            context.fill();
+          },
+          onMouseMove(event) {
+            const { x, y } = this.$el.getBoundingClientRect();
+            this.mouse.x = event.clientX - x;
+            this.mouse.y = event.clientY - y;
+            this.drawEdges();
+          },
+          onRootResize(entries) {
+            const entry = entries[0];
+            const width = entry.contentBoxSize[0].inlineSize;
+            const height = entry.contentBoxSize[0].blockSize;
+            const dpi = window.devicePixelRatio || 1;
+            this.canvas.width = Math.floor(width * dpi);
+            this.canvas.height = Math.floor(height * dpi);
+            this.canvas.style.width = `${width}px`;
+            this.canvas.style.height = `${height}px`;
+          }
+        },
+        mounted() {
+          this.canvas = createHighDPICanvas(0, 0);
+          this.$el.appendChild(this.canvas);
+          this.resizeObserver = new ResizeObserver(this.onRootResize);
+          this.resizeObserver.observe(this.$el);
+          window.addEventListener("mousemove", this.onMouseMove);
+          setTimeout(() => {
+            const dpi = window.devicePixelRatio || 1;
+            const { width, height } = this.$el.getBoundingClientRect();
+            this.canvas.width = Math.floor(width * dpi);
+            this.canvas.height = Math.floor(height * dpi);
+            this.canvas.style.width = `${Math.floor(width)}px`;
+            this.canvas.style.height = `${Math.floor(height)}px`;
+          }, 250);
+        },
+        unmounted() {
+          this.resizeObserver.disconnect();
+          window.removeEventListener("mousemove", this.onMouseMove);
         }
       });
     }
