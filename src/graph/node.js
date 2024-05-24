@@ -68,6 +68,12 @@ const template = /* html */ `
           :key="jack.id"
           :title="jack.title"
           :type="jack.type"
+          @jack-hole-mouse-down="
+            $emit('jack-mouse-down', { jack, rect: $event })
+          "
+          @jack-hole-mouse-enter="
+            $emit('jack-mouse-enter', { jack, rect: $event })
+          "
           v-for="jack in inputJacks">
         </x-jack>
       </div>
@@ -78,6 +84,12 @@ const template = /* html */ `
           :key="jack.id"
           :title="jack.title"
           :type="jack.type"
+          @jack-hole-mouse-down="
+            $emit('jack-mouse-down', { jack, rect: $event })
+          "
+          @jack-hole-mouse-enter="
+            $emit('jack-mouse-enter', { jack, rect: $event })
+          "
           v-for="jack in outputJacks">
         </x-jack>
       </div>
@@ -97,7 +109,7 @@ const makeKey = require("@jrc03c/make-key")
 module.exports = createVueComponentWithCSS({
   name: "x-node",
   template,
-  emits: [...DraggableComponent.emits],
+  emits: [...DraggableComponent.emits, "jack-mouse-down", "jack-mouse-enter"],
 
   components: {
     "x-draggable": DraggableComponent,

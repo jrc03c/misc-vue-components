@@ -6,8 +6,6 @@ const css = /* css */ `
   .x-graph {
     overflow: hidden;
     position: absolute;
-    width: 50vw !important;
-    height: 50vh !important;
   }
 
   .x-graph canvas {
@@ -32,6 +30,12 @@ const template = /* html */ `
       :key="node.id"
       :x="node.x"
       :y="node.y"
+      @jack-mouse-down="
+        onJackMouseDown({ node, jack: $event.jack, rect: $event.rect })
+      "
+      @jack-mouse-enter="
+        onJackMouseEnter({ node, jack: $event.jack, rect: $event.rect })
+      "
       @mousedown="$emit('move-node-to-top', node)"
       v-for="node in nodes">
     </x-node>
@@ -76,6 +80,12 @@ module.exports = createVueComponentWithCSS({
       canvas: null,
       css,
       mouse: { x: 0, y: 0 },
+      newEdge: {
+        endJack: null,
+        isBeingCreated: false,
+        startJack: null,
+        startPoint: { x: 0, y: 0 },
+      },
       resizeObserver: null,
     }
   },
@@ -86,10 +96,39 @@ module.exports = createVueComponentWithCSS({
       const { width, height } = canvas
       const context = canvas.getContext("2d")
       context.clearRect(0, 0, width, height)
-      context.fillStyle = "red"
-      context.beginPath()
-      context.arc(this.mouse.x, this.mouse.y, 32, 0, Math.PI * 2)
-      context.fill()
+      context.strokeStyle = "red"
+      context.lineWidth = 1
+
+      const offset = this.$el.getBoundingClientRect()
+      const xmid = (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2
+
+      if (this.newEdge.isBeingCreated) {
+        context.beginPath()
+
+        context.moveTo(
+          this.newEdge.startPoint.x - offset.x,
+          this.newEdge.startPoint.y - offset.y,
+        )
+
+        context.lineTo(xmid, this.newEdge.startPoint.y - offset.y)
+        context.lineTo(xmid, this.mouse.y)
+        context.lineTo(this.mouse.x, this.mouse.y)
+        context.stroke()
+      }
+    },
+
+    onJackMouseDown(data) {
+      this.newEdge.isBeingCreated = true
+      this.newEdge.startJack = data.jack
+
+      this.newEdge.startPoint = {
+        x: data.rect.x + data.rect.width / 2,
+        y: data.rect.y + data.rect.height / 2,
+      }
+    },
+
+    onJackMouseEnter() {
+      // ...
     },
 
     onMouseMove(event) {
@@ -97,6 +136,16 @@ module.exports = createVueComponentWithCSS({
       this.mouse.x = event.clientX - x
       this.mouse.y = event.clientY - y
       this.drawEdges()
+    },
+
+    onMouseUp() {
+      this.newEdge = {
+        endJack: null,
+        endPoint: { x: 0, y: 0 },
+        isBeingCreated: false,
+        startJack: null,
+        startPoint: { x: 0, y: 0 },
+      }
     },
 
     onRootResize(entries) {
@@ -117,6 +166,7 @@ module.exports = createVueComponentWithCSS({
     this.resizeObserver = new ResizeObserver(this.onRootResize)
     this.resizeObserver.observe(this.$el)
     window.addEventListener("mousemove", this.onMouseMove)
+    window.addEventListener("mouseup", this.onMouseUp)
 
     setTimeout(() => {
       const dpi = window.devicePixelRatio || 1
@@ -131,5 +181,6 @@ module.exports = createVueComponentWithCSS({
   unmounted() {
     this.resizeObserver.disconnect()
     window.removeEventListener("mousemove", this.onMouseMove)
+    window.removeEventListener("mouseup", this.onMouseUp)
   },
 })

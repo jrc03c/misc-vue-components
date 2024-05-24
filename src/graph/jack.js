@@ -62,7 +62,12 @@ const template = /* html */ `
       'x-output-jack': type === 'output'
     }"
     class="x-jack">
-    <div class="x-jack-hole"></div>
+    <div
+      @mousedown.stop.prevent="onHoleMouseDown"
+      @mouseenter="onHoleMouseEnter"
+      class="x-jack-hole"
+      ref="hole">
+    </div>
 
     <div class="x-jack-title">
       {{ title }}
@@ -80,7 +85,13 @@ const makeKey = require("@jrc03c/make-key")
 module.exports = createVueComponentWithCSS({
   name: "x-jack",
   template,
-  emits: ["connect", "disconnect"],
+
+  emits: [
+    "connect",
+    "disconnect",
+    "jack-hole-mouse-down",
+    "jack-hole-mouse-enter",
+  ],
 
   props: {
     id: {
@@ -106,5 +117,21 @@ module.exports = createVueComponentWithCSS({
     return {
       css,
     }
+  },
+
+  methods: {
+    onHoleMouseDown() {
+      this.$emit(
+        "jack-hole-mouse-down",
+        this.$refs.hole.getBoundingClientRect(),
+      )
+    },
+
+    onHoleMouseEnter() {
+      this.$emit(
+        "jack-hole-mouse-enter",
+        this.$refs.hole.getBoundingClientRect(),
+      )
+    },
   },
 })
