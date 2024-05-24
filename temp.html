@@ -16,6 +16,7 @@
       <x-graph
         :edges="edges"
         :nodes="nodes"
+        @create-new-edge="edges.push($event)"
         @move-node-to-top="onMoveNodeToTop">
       </x-graph>
     </div>
@@ -32,23 +33,29 @@
         },
 
         data() {
+          const n1 = {
+            id: makeKey(8),
+            x: 64,
+            y: 64,
+            jacks: [],
+          }
+
+          const j1 = { id: makeKey(8), node: n1, title: "a", type: "output" }
+          n1.jacks.push(j1)
+
+          const n2 = {
+            id: makeKey(8),
+            x: 512,
+            y: 256,
+            jacks: [],
+          }
+
+          const j2 = { id: makeKey(8), node: n2, title: "b", type: "input" }
+          n2.jacks.push(j2)
+
           return {
             edges: [],
-
-            nodes: [
-              {
-                id: makeKey(8),
-                x: 64,
-                y: 64,
-                jacks: [{ id: makeKey(8), title: "a", type: "output" }],
-              },
-              {
-                id: makeKey(8),
-                x: 512,
-                y: 256,
-                jacks: [{ id: makeKey(8), title: "b", type: "input" }],
-              },
-            ],
+            nodes: [n1, n2],
           }
         },
 

@@ -48,16 +48,14 @@ const template = /* html */ `
 
 const createHighDPICanvas = require("@jrc03c/create-high-dpi-canvas")
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
-const EdgeComponent = require("./edge")
 const NodeComponent = require("./node")
 
 module.exports = createVueComponentWithCSS({
   name: "x-graph",
   template,
-  emits: ["move-node-to-top"],
+  emits: ["create-new-edge", "move-node-to-top"],
 
   components: {
-    "x-edge": EdgeComponent,
     "x-node": NodeComponent,
   },
 
@@ -81,9 +79,9 @@ module.exports = createVueComponentWithCSS({
       css,
       mouse: { x: 0, y: 0 },
       newEdge: {
-        endJack: null,
+        inputJack: null,
         isBeingCreated: false,
-        startJack: null,
+        outputJack: null,
         startPoint: { x: 0, y: 0 },
       },
       resizeObserver: null,
@@ -100,26 +98,63 @@ module.exports = createVueComponentWithCSS({
       context.lineWidth = 1
 
       const offset = this.$el.getBoundingClientRect()
-      const xmid = (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2
 
       if (this.newEdge.isBeingCreated) {
+        const xmid = Math.round(
+          (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2,
+        )
+
         context.beginPath()
 
         context.moveTo(
-          this.newEdge.startPoint.x - offset.x,
-          this.newEdge.startPoint.y - offset.y,
+          Math.round(this.newEdge.startPoint.x - offset.x),
+          Math.round(this.newEdge.startPoint.y - offset.y),
         )
 
-        context.lineTo(xmid, this.newEdge.startPoint.y - offset.y)
-        context.lineTo(xmid, this.mouse.y)
-        context.lineTo(this.mouse.x, this.mouse.y)
+        context.lineTo(xmid, Math.round(this.newEdge.startPoint.y - offset.y))
+        context.lineTo(xmid, Math.round(this.mouse.y))
+        context.lineTo(Math.round(this.mouse.x), Math.round(this.mouse.y))
+        context.stroke()
+      }
+
+      context.strokeStyle = "black"
+
+      for (const edge of this.edges) {
+        const j1 = this.$el
+          .querySelector("#jack-" + edge.inputJack.id)
+          .querySelector(".x-jack-hole")
+
+        const j2 = this.$el
+          .querySelector("#jack-" + edge.outputJack.id)
+          .querySelector(".x-jack-hole")
+
+        const j1Rect = j1.getBoundingClientRect()
+        const j2Rect = j2.getBoundingClientRect()
+
+        const p1 = {
+          x: Math.round(j1Rect.x + j1Rect.width / 2 - offset.x),
+          y: Math.round(j1Rect.y + j1Rect.height / 2 - offset.x),
+        }
+
+        const p2 = {
+          x: Math.round(j2Rect.x + j2Rect.width / 2 - offset.x),
+          y: Math.round(j2Rect.y + j2Rect.height / 2 - offset.x),
+        }
+
+        const xmid = Math.round((p1.x + p2.x) / 2)
+
+        context.beginPath()
+        context.moveTo(p1.x, p1.y)
+        context.lineTo(xmid, p1.y)
+        context.lineTo(xmid, p2.y)
+        context.lineTo(p2.x, p2.y)
         context.stroke()
       }
     },
 
     onJackMouseDown(data) {
       this.newEdge.isBeingCreated = true
-      this.newEdge.startJack = data.jack
+      this.newEdge.inputJack = data.jack
 
       this.newEdge.startPoint = {
         x: data.rect.x + data.rect.width / 2,
@@ -127,8 +162,10 @@ module.exports = createVueComponentWithCSS({
       }
     },
 
-    onJackMouseEnter() {
-      // ...
+    onJackMouseEnter(data) {
+      if (this.newEdge.isBeingCreated && data.jack !== this.newEdge.inputJack) {
+        this.newEdge.outputJack = data.jack
+      }
     },
 
     onMouseMove(event) {
@@ -139,11 +176,20 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseUp() {
+      if (this.newEdge.isBeingCreated) {
+        const newNode = {
+          outputJack: this.newEdge.outputJack,
+          inputJack: this.newEdge.inputJack,
+        }
+
+        this.$emit("create-new-edge", newNode)
+      }
+
       this.newEdge = {
-        endJack: null,
+        outputJack: null,
         endPoint: { x: 0, y: 0 },
         isBeingCreated: false,
-        startJack: null,
+        inputJack: null,
         startPoint: { x: 0, y: 0 },
       }
     },

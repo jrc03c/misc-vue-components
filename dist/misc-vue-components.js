@@ -7029,52 +7029,6 @@
     }
   });
 
-  // src/graph/edge.js
-  var require_edge = __commonJS({
-    "src/graph/edge.js"(exports, module) {
-      var css = (
-        /* css */
-        ``
-      );
-      var template = (
-        /* html */
-        `
-  <div class="x-edge">
-    This is an edge with ID: {{ id }}
-  </div>
-`
-      );
-      var createVueComponentWithCSS = require_src();
-      var makeKey = require_src3();
-      module.exports = createVueComponentWithCSS({
-        name: "x-edge",
-        template,
-        props: {
-          id: {
-            type: String,
-            required: false,
-            default: () => makeKey(8)
-          },
-          "input-jack": {
-            type: Object,
-            required: true,
-            default: () => null
-          },
-          "output-jack": {
-            type: Object,
-            required: true,
-            default: () => null
-          }
-        },
-        data() {
-          return {
-            css
-          };
-        }
-      });
-    }
-  });
-
   // src/graph/jack.js
   var require_jack = __commonJS({
     "src/graph/jack.js"(exports, module) {
@@ -7137,6 +7091,7 @@
       'x-input-jack': type === 'input',
       'x-output-jack': type === 'output'
     }"
+    :id="'jack-' + id"
     class="x-jack">
     <div
       @mousedown.stop.prevent="onHoleMouseDown"
@@ -7246,6 +7201,7 @@
         /* html */
         `
   <x-draggable
+    :id="'node-' + id"
     :is-h-locked="isHLocked"
     :is-v-locked="isVLocked"
     :x="x"
@@ -7393,14 +7349,12 @@
       );
       var createHighDPICanvas = require_create_high_dpi_canvas();
       var createVueComponentWithCSS = require_src();
-      var EdgeComponent = require_edge();
       var NodeComponent = require_node();
       module.exports = createVueComponentWithCSS({
         name: "x-graph",
         template,
-        emits: ["move-node-to-top"],
+        emits: ["create-new-edge", "move-node-to-top"],
         components: {
-          "x-edge": EdgeComponent,
           "x-node": NodeComponent
         },
         props: {
@@ -7421,9 +7375,9 @@
             css,
             mouse: { x: 0, y: 0 },
             newEdge: {
-              endJack: null,
+              inputJack: null,
               isBeingCreated: false,
-              startJack: null,
+              outputJack: null,
               startPoint: { x: 0, y: 0 }
             },
             resizeObserver: null
@@ -7438,28 +7392,55 @@
             context.strokeStyle = "red";
             context.lineWidth = 1;
             const offset = this.$el.getBoundingClientRect();
-            const xmid = (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2;
             if (this.newEdge.isBeingCreated) {
+              const xmid = Math.round(
+                (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2
+              );
               context.beginPath();
               context.moveTo(
-                this.newEdge.startPoint.x - offset.x,
-                this.newEdge.startPoint.y - offset.y
+                Math.round(this.newEdge.startPoint.x - offset.x),
+                Math.round(this.newEdge.startPoint.y - offset.y)
               );
-              context.lineTo(xmid, this.newEdge.startPoint.y - offset.y);
-              context.lineTo(xmid, this.mouse.y);
-              context.lineTo(this.mouse.x, this.mouse.y);
+              context.lineTo(xmid, Math.round(this.newEdge.startPoint.y - offset.y));
+              context.lineTo(xmid, Math.round(this.mouse.y));
+              context.lineTo(Math.round(this.mouse.x), Math.round(this.mouse.y));
+              context.stroke();
+            }
+            context.strokeStyle = "black";
+            for (const edge of this.edges) {
+              const j1 = this.$el.querySelector("#jack-" + edge.inputJack.id).querySelector(".x-jack-hole");
+              const j2 = this.$el.querySelector("#jack-" + edge.outputJack.id).querySelector(".x-jack-hole");
+              const j1Rect = j1.getBoundingClientRect();
+              const j2Rect = j2.getBoundingClientRect();
+              const p1 = {
+                x: Math.round(j1Rect.x + j1Rect.width / 2 - offset.x),
+                y: Math.round(j1Rect.y + j1Rect.height / 2 - offset.x)
+              };
+              const p2 = {
+                x: Math.round(j2Rect.x + j2Rect.width / 2 - offset.x),
+                y: Math.round(j2Rect.y + j2Rect.height / 2 - offset.x)
+              };
+              const xmid = Math.round((p1.x + p2.x) / 2);
+              context.beginPath();
+              context.moveTo(p1.x, p1.y);
+              context.lineTo(xmid, p1.y);
+              context.lineTo(xmid, p2.y);
+              context.lineTo(p2.x, p2.y);
               context.stroke();
             }
           },
           onJackMouseDown(data) {
             this.newEdge.isBeingCreated = true;
-            this.newEdge.startJack = data.jack;
+            this.newEdge.inputJack = data.jack;
             this.newEdge.startPoint = {
               x: data.rect.x + data.rect.width / 2,
               y: data.rect.y + data.rect.height / 2
             };
           },
-          onJackMouseEnter() {
+          onJackMouseEnter(data) {
+            if (this.newEdge.isBeingCreated && data.jack !== this.newEdge.inputJack) {
+              this.newEdge.outputJack = data.jack;
+            }
           },
           onMouseMove(event) {
             const { x, y } = this.$el.getBoundingClientRect();
@@ -7468,11 +7449,18 @@
             this.drawEdges();
           },
           onMouseUp() {
+            if (this.newEdge.isBeingCreated) {
+              const newNode = {
+                outputJack: this.newEdge.outputJack,
+                inputJack: this.newEdge.inputJack
+              };
+              this.$emit("create-new-edge", newNode);
+            }
             this.newEdge = {
-              endJack: null,
+              outputJack: null,
               endPoint: { x: 0, y: 0 },
               isBeingCreated: false,
-              startJack: null,
+              inputJack: null,
               startPoint: { x: 0, y: 0 }
             };
           },

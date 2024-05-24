@@ -42,6 +42,7 @@ const css = /* css */ `
 
 const template = /* html */ `
   <x-draggable
+    :id="'node-' + id"
     :is-h-locked="isHLocked"
     :is-v-locked="isVLocked"
     :x="x"

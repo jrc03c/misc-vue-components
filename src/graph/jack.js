@@ -61,6 +61,7 @@ const template = /* html */ `
       'x-input-jack': type === 'input',
       'x-output-jack': type === 'output'
     }"
+    :id="'jack-' + id"
     class="x-jack">
     <div
       @mousedown.stop.prevent="onHoleMouseDown"
