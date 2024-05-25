@@ -7380,7 +7380,10 @@
               outputJack: null,
               startPoint: { x: 0, y: 0 }
             },
-            resizeObserver: null
+            rect: { x: 0, y: 0, width: 0, height: 0 },
+            resizeObserver: null,
+            shouldKeepDrawingEdges: true,
+            shouldRecomputeRect: false
           };
         },
         methods: {
@@ -7389,24 +7392,9 @@
             const { width, height } = canvas;
             const context = canvas.getContext("2d");
             context.clearRect(0, 0, width, height);
-            context.strokeStyle = "red";
+            context.strokeStyle = "black";
             context.lineWidth = 1;
             const offset = this.$el.getBoundingClientRect();
-            if (this.newEdge.isBeingCreated) {
-              const xmid = Math.round(
-                (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2
-              );
-              context.beginPath();
-              context.moveTo(
-                Math.round(this.newEdge.startPoint.x - offset.x),
-                Math.round(this.newEdge.startPoint.y - offset.y)
-              );
-              context.lineTo(xmid, Math.round(this.newEdge.startPoint.y - offset.y));
-              context.lineTo(xmid, Math.round(this.mouse.y));
-              context.lineTo(Math.round(this.mouse.x), Math.round(this.mouse.y));
-              context.stroke();
-            }
-            context.strokeStyle = "black";
             for (const edge of this.edges) {
               const j1 = this.$el.querySelector("#jack-" + edge.inputJack.id).querySelector(".x-jack-hole");
               const j2 = this.$el.querySelector("#jack-" + edge.outputJack.id).querySelector(".x-jack-hole");
@@ -7428,6 +7416,21 @@
               context.lineTo(p2.x, p2.y);
               context.stroke();
             }
+            context.strokeStyle = "red";
+            if (this.newEdge.isBeingCreated) {
+              const xmid = Math.round(
+                (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2
+              );
+              context.beginPath();
+              context.moveTo(
+                Math.round(this.newEdge.startPoint.x - offset.x),
+                Math.round(this.newEdge.startPoint.y - offset.y)
+              );
+              context.lineTo(xmid, Math.round(this.newEdge.startPoint.y - offset.y));
+              context.lineTo(xmid, Math.round(this.mouse.y));
+              context.lineTo(Math.round(this.mouse.x), Math.round(this.mouse.y));
+              context.stroke();
+            }
           },
           onJackMouseDown(data) {
             this.newEdge.isBeingCreated = true;
@@ -7443,13 +7446,17 @@
             }
           },
           onMouseMove(event) {
-            const { x, y } = this.$el.getBoundingClientRect();
+            let { x, y } = this.rect;
+            if (this.shouldRecomputeRect) {
+              this.updateRect();
+              x = this.rect.x;
+              y = this.rect.y;
+            }
             this.mouse.x = event.clientX - x;
             this.mouse.y = event.clientY - y;
-            this.drawEdges();
           },
           onMouseUp() {
-            if (this.newEdge.isBeingCreated) {
+            if (this.newEdge.isBeingCreated && this.newEdge.outputJack) {
               const newNode = {
                 outputJack: this.newEdge.outputJack,
                 inputJack: this.newEdge.inputJack
@@ -7473,6 +7480,11 @@
             this.canvas.height = Math.floor(height * dpi);
             this.canvas.style.width = `${width}px`;
             this.canvas.style.height = `${height}px`;
+            this.shouldRecomputeRect = true;
+          },
+          updateRect() {
+            this.rect = this.$el.getBoundingClientRect();
+            this.shouldRecomputeRect = false;
           }
         },
         mounted() {
@@ -7490,8 +7502,16 @@
             this.canvas.style.width = `${Math.floor(width)}px`;
             this.canvas.style.height = `${Math.floor(height)}px`;
           }, 250);
+          this.shouldKeepDrawingEdges = true;
+          const interval = setInterval(() => {
+            if (!this.shouldKeepDrawingEdges) {
+              return clearInterval(interval);
+            }
+            this.drawEdges();
+          }, 1e3 / 60);
         },
         unmounted() {
+          this.shouldKeepDrawingEdges = false;
           this.resizeObserver.disconnect();
           window.removeEventListener("mousemove", this.onMouseMove);
           window.removeEventListener("mouseup", this.onMouseUp);
