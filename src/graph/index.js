@@ -72,6 +72,20 @@ module.exports = createVueComponentWithCSS({
   },
 
   props: {
+    "edge-draw-function": {
+      type: "function",
+      required: false,
+      default: () => {
+        return (context, p1, p2, isNewEdge) => {
+          context.strokeStyle = isNewEdge ? "red" : "black"
+          context.beginPath()
+          context.moveTo(p1.x, p1.y)
+          context.lineTo(p2.x, p2.y)
+          context.stroke()
+        }
+      },
+    },
+
     edges: {
       type: Array,
       required: false,
@@ -131,34 +145,23 @@ module.exports = createVueComponentWithCSS({
           y: Math.round(j2Rect.y + j2Rect.height / 2 - offset.x),
         }
 
-        const xmid = Math.round((p1.x + p2.x) / 2)
-
-        context.beginPath()
-        context.moveTo(p1.x, p1.y)
-        context.lineTo(xmid, p1.y)
-        context.lineTo(xmid, p2.y)
-        context.lineTo(p2.x, p2.y)
-        context.stroke()
+        this.edgeDrawFunction(context, p1, p2)
       }
 
       context.strokeStyle = "red"
 
       if (this.newEdge.isBeingCreated) {
-        const xmid = Math.round(
-          (this.newEdge.startPoint.x - offset.x + this.mouse.x) / 2,
-        )
+        const p1 = {
+          x: this.newEdge.startPoint.x - offset.x,
+          y: this.newEdge.startPoint.y - offset.y,
+        }
 
-        context.beginPath()
+        const p2 = {
+          x: this.mouse.x,
+          y: this.mouse.y,
+        }
 
-        context.moveTo(
-          Math.round(this.newEdge.startPoint.x - offset.x),
-          Math.round(this.newEdge.startPoint.y - offset.y),
-        )
-
-        context.lineTo(xmid, Math.round(this.newEdge.startPoint.y - offset.y))
-        context.lineTo(xmid, Math.round(this.mouse.y))
-        context.lineTo(Math.round(this.mouse.x), Math.round(this.mouse.y))
-        context.stroke()
+        this.edgeDrawFunction(context, p1, p2, true)
       }
     },
 
