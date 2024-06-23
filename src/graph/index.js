@@ -55,6 +55,7 @@ const NodeComponent = require("./node")
 
 class NewEdgeHelper {
   endPoint = { x: 0, y: 0 }
+  firstJackType = null
   inputJack = null
   isBeingCreated = false
   outputJack = null
@@ -163,7 +164,14 @@ module.exports = createVueComponentWithCSS({
 
     onJackMouseDown(data) {
       this.newEdge.isBeingCreated = true
-      this.newEdge.inputJack = data.jack
+
+      if (data.jack.type === "input") {
+        this.newEdge.outputJack = data.jack
+        this.newEdge.firstJackType = "input"
+      } else {
+        this.newEdge.inputJack = data.jack
+        this.newEdge.firstJackType = "output"
+      }
 
       this.newEdge.startPoint = {
         x: data.rect.x + data.rect.width / 2,
@@ -172,13 +180,25 @@ module.exports = createVueComponentWithCSS({
     },
 
     onJackMouseEnter(data) {
-      if (this.newEdge.isBeingCreated && data.jack !== this.newEdge.inputJack) {
-        this.newEdge.outputJack = data.jack
+      if (
+        this.newEdge.isBeingCreated &&
+        data.jack !== this.newEdge.inputJack &&
+        data.jack !== this.newEdge.outputJack
+      ) {
+        if (this.newEdge.inputJack) {
+          this.newEdge.outputJack = data.jack
+        } else {
+          this.newEdge.inputJack = data.jack
+        }
       }
     },
 
     onJackMouseLeave() {
-      this.newEdge.outputJack = null
+      if (this.newEdge.firstJackType === "input") {
+        this.newEdge.inputJack = null
+      } else {
+        this.newEdge.outputJack = null
+      }
     },
 
     onMouseMove(event) {
@@ -195,7 +215,11 @@ module.exports = createVueComponentWithCSS({
     },
 
     onMouseUp() {
-      if (this.newEdge.isBeingCreated && this.newEdge.outputJack) {
+      if (
+        this.newEdge.isBeingCreated &&
+        this.newEdge.inputJack &&
+        this.newEdge.outputJack
+      ) {
         const newNode = {
           outputJack: this.newEdge.outputJack,
           inputJack: this.newEdge.inputJack,
