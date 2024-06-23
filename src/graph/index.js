@@ -53,6 +53,14 @@ const createHighDPICanvas = require("@jrc03c/create-high-dpi-canvas")
 const createVueComponentWithCSS = require("@jrc03c/vue-component-with-css")
 const NodeComponent = require("./node")
 
+class NewEdgeHelper {
+  endPoint = { x: 0, y: 0 }
+  inputJack = null
+  isBeingCreated = false
+  outputJack = null
+  startPoint = { x: 0, y: 0 }
+}
+
 module.exports = createVueComponentWithCSS({
   name: "x-graph",
   template,
@@ -81,12 +89,7 @@ module.exports = createVueComponentWithCSS({
       canvas: null,
       css,
       mouse: { x: 0, y: 0 },
-      newEdge: {
-        inputJack: null,
-        isBeingCreated: false,
-        outputJack: null,
-        startPoint: { x: 0, y: 0 },
-      },
+      newEdge: new NewEdgeHelper(),
       rect: { x: 0, y: 0, width: 0, height: 0 },
       resizeObserver: null,
       shouldKeepDrawingEdges: true,
@@ -201,13 +204,7 @@ module.exports = createVueComponentWithCSS({
         this.$emit("create-new-edge", newNode)
       }
 
-      this.newEdge = {
-        outputJack: null,
-        endPoint: { x: 0, y: 0 },
-        isBeingCreated: false,
-        inputJack: null,
-        startPoint: { x: 0, y: 0 },
-      }
+      this.newEdge = new NewEdgeHelper()
     },
 
     onRootResize(entries) {
