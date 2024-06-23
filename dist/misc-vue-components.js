@@ -7096,6 +7096,7 @@
     <div
       @mousedown.stop.prevent="onHoleMouseDown"
       @mouseenter="onHoleMouseEnter"
+      @mouseleave="onHoleMouseLeave"
       class="x-jack-hole"
       ref="hole">
     </div>
@@ -7115,7 +7116,8 @@
           "connect",
           "disconnect",
           "jack-hole-mouse-down",
-          "jack-hole-mouse-enter"
+          "jack-hole-mouse-enter",
+          "jack-hole-mouse-leave"
         ],
         props: {
           id: {
@@ -7150,6 +7152,12 @@
           onHoleMouseEnter() {
             this.$emit(
               "jack-hole-mouse-enter",
+              this.$refs.hole.getBoundingClientRect()
+            );
+          },
+          onHoleMouseLeave() {
+            this.$emit(
+              "jack-hole-mouse-leave",
               this.$refs.hole.getBoundingClientRect()
             );
           }
@@ -7234,6 +7242,9 @@
           @jack-hole-mouse-enter="
             $emit('jack-mouse-enter', { jack, rect: $event })
           "
+          @jack-hole-mouse-leave="
+            $emit('jack-mouse-leave', { jack, rect: $event })
+          "
           v-for="jack in inputJacks">
         </x-jack>
       </div>
@@ -7250,6 +7261,9 @@
           @jack-hole-mouse-enter="
             $emit('jack-mouse-enter', { jack, rect: $event })
           "
+          @jack-hole-mouse-leave="
+            $emit('jack-mouse-leave', { jack, rect: $event })
+          "
           v-for="jack in outputJacks">
         </x-jack>
       </div>
@@ -7264,7 +7278,12 @@
       module.exports = createVueComponentWithCSS({
         name: "x-node",
         template,
-        emits: [...DraggableComponent.emits, "jack-mouse-down", "jack-mouse-enter"],
+        emits: [
+          ...DraggableComponent.emits,
+          "jack-mouse-down",
+          "jack-mouse-enter",
+          "jack-mouse-leave"
+        ],
         components: {
           "x-draggable": DraggableComponent,
           "x-jack": JackComponent
@@ -7340,6 +7359,9 @@
       "
       @jack-mouse-enter="
         onJackMouseEnter({ node, jack: $event.jack, rect: $event.rect })
+      "
+      @jack-mouse-leave="
+        onJackMouseLeave({ node, jack: $event.jack, rect: $event.rect })
       "
       @mousedown="$emit('move-node-to-top', node)"
       v-for="node in nodes">
@@ -7444,6 +7466,9 @@
             if (this.newEdge.isBeingCreated && data.jack !== this.newEdge.inputJack) {
               this.newEdge.outputJack = data.jack;
             }
+          },
+          onJackMouseLeave() {
+            this.newEdge.outputJack = null;
           },
           onMouseMove(event) {
             let { x, y } = this.rect;

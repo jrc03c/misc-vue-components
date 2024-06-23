@@ -36,6 +36,9 @@ const template = /* html */ `
       @jack-mouse-enter="
         onJackMouseEnter({ node, jack: $event.jack, rect: $event.rect })
       "
+      @jack-mouse-leave="
+        onJackMouseLeave({ node, jack: $event.jack, rect: $event.rect })
+      "
       @mousedown="$emit('move-node-to-top', node)"
       v-for="node in nodes">
     </x-node>
@@ -169,6 +172,10 @@ module.exports = createVueComponentWithCSS({
       if (this.newEdge.isBeingCreated && data.jack !== this.newEdge.inputJack) {
         this.newEdge.outputJack = data.jack
       }
+    },
+
+    onJackMouseLeave() {
+      this.newEdge.outputJack = null
     },
 
     onMouseMove(event) {

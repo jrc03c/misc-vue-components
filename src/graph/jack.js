@@ -66,6 +66,7 @@ const template = /* html */ `
     <div
       @mousedown.stop.prevent="onHoleMouseDown"
       @mouseenter="onHoleMouseEnter"
+      @mouseleave="onHoleMouseLeave"
       class="x-jack-hole"
       ref="hole">
     </div>
@@ -92,6 +93,7 @@ module.exports = createVueComponentWithCSS({
     "disconnect",
     "jack-hole-mouse-down",
     "jack-hole-mouse-enter",
+    "jack-hole-mouse-leave",
   ],
 
   props: {
@@ -131,6 +133,13 @@ module.exports = createVueComponentWithCSS({
     onHoleMouseEnter() {
       this.$emit(
         "jack-hole-mouse-enter",
+        this.$refs.hole.getBoundingClientRect(),
+      )
+    },
+
+    onHoleMouseLeave() {
+      this.$emit(
+        "jack-hole-mouse-leave",
         this.$refs.hole.getBoundingClientRect(),
       )
     },
