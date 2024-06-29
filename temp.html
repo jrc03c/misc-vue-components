@@ -26,14 +26,6 @@
     <script src="node_modules/@jrc03c/make-key/dist/make-key.js"></script>
     <script src="dist/misc-vue-components.js"></script>
     <script>
-      function curve(x) {
-        return Math.sin(Math.PI * x - Math.PI / 2) * 0.5 + 0.5
-      }
-
-      function lerp(a, b, f) {
-        return a + f * (b - a)
-      }
-
       const { createApp } = Vue
 
       const app = createApp({
@@ -70,21 +62,11 @@
 
         methods: {
           drawEdge(context, p1, p2, isNew) {
-            const length = Math.sqrt(
-              Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2),
-            )
-
-            let angle = Math.atan((p2.y - p1.y) / (p2.x - p1.x))
-
-            if (p2.x < p1.x) {
-              angle += Math.PI
-            }
-
             context.strokeStyle = isNew ? "red" : "black"
             context.lineWidth = 1
             context.save()
 
-            const gap = 16
+            const gap = 0
             const midx = (p1.x + gap + p2.x - gap) / 2
             context.beginPath()
             context.moveTo(p1.x + gap, p1.y)
