@@ -8,6 +8,11 @@ const css = /* css */ `
     position: absolute;
   }
 
+  .x-graph,
+  .x-graph * {
+    user-select: none;
+  }
+
   .x-graph canvas {
     position: absolute;
     left: 0;
@@ -16,6 +21,10 @@ const css = /* css */ `
     height: 100%;
     pointer-events: none;
   }
+
+  .x-graph .x-node.is-selected {
+    background-color: hsl(225deg, 100%, 85%);
+  }
 `
 
 // -----------------------------------------------------------------------------
@@ -23,13 +32,15 @@ const css = /* css */ `
 // -----------------------------------------------------------------------------
 
 const template = /* html */ `
-  <div class="x-graph">
+  <div class="x-graph" @click="selectedNodes = []">
     <x-node
+      :class="{ 'is-selected': selectedNodes.includes(node) }"
       :id="node.id"
       :jacks="node.jacks"
       :key="node.id"
       :x="node.x"
       :y="node.y"
+      @click.stop.prevent=""
       @jack-mouse-down="
         onJackMouseDown({ node, jack: $event.jack, rect: $event.rect })
       "
@@ -39,7 +50,7 @@ const template = /* html */ `
       @jack-mouse-leave="
         onJackMouseLeave({ node, jack: $event.jack, rect: $event.rect })
       "
-      @mousedown="$emit('move-node-to-top', node)"
+      @mousedown.stop.prevent="selectNode(node)"
       v-for="node in nodes">
     </x-node>
   </div>
@@ -103,10 +114,12 @@ module.exports = createVueComponentWithCSS({
     return {
       canvas: null,
       css,
+      keys: {},
       mouse: { x: 0, y: 0 },
       newEdge: new NewEdgeHelper(),
       rect: { x: 0, y: 0, width: 0, height: 0 },
       resizeObserver: null,
+      selectedNodes: [],
       shouldKeepDrawingEdges: true,
       shouldRecomputeRect: false,
     }
@@ -204,6 +217,18 @@ module.exports = createVueComponentWithCSS({
       }
     },
 
+    onKeyDown(event) {
+      this.keys[event.key] = true
+
+      if (event.key === "Escape") {
+        this.selectedNodes.splice(0, this.selectedNodes.length)
+      }
+    },
+
+    onKeyUp(event) {
+      delete this.keys[event.key]
+    },
+
     onMouseMove(event) {
       let { x, y } = this.rect
 
@@ -221,14 +246,19 @@ module.exports = createVueComponentWithCSS({
       if (
         this.newEdge.isBeingCreated &&
         this.newEdge.inputJack &&
-        this.newEdge.outputJack
+        this.newEdge.outputJack &&
+        !this.edges.find(
+          e =>
+            e.inputJack === this.newEdge.inputJack &&
+            e.outputJack === this.newEdge.outputJack,
+        )
       ) {
-        const newNode = {
+        const newEdge = {
           outputJack: this.newEdge.outputJack,
           inputJack: this.newEdge.inputJack,
         }
 
-        this.$emit("create-new-edge", newNode)
+        this.$emit("create-new-edge", newEdge)
       }
 
       this.newEdge = new NewEdgeHelper()
@@ -246,6 +276,18 @@ module.exports = createVueComponentWithCSS({
       this.shouldRecomputeRect = true
     },
 
+    selectNode(node) {
+      if (!this.keys.Shift) {
+        this.selectedNodes = []
+      }
+
+      if (!this.selectedNodes.includes(node)) {
+        this.selectedNodes.push(node)
+      }
+
+      this.$emit("move-node-to-top", node)
+    },
+
     updateRect() {
       this.rect = this.$el.getBoundingClientRect()
       this.shouldRecomputeRect = false
@@ -257,6 +299,8 @@ module.exports = createVueComponentWithCSS({
     this.$el.appendChild(this.canvas)
     this.resizeObserver = new ResizeObserver(this.onRootResize)
     this.resizeObserver.observe(this.$el)
+    window.addEventListener("keydown", this.onKeyDown)
+    window.addEventListener("keyup", this.onKeyUp)
     window.addEventListener("mousemove", this.onMouseMove)
     window.addEventListener("mouseup", this.onMouseUp)
 
@@ -283,6 +327,8 @@ module.exports = createVueComponentWithCSS({
   unmounted() {
     this.shouldKeepDrawingEdges = false
     this.resizeObserver.disconnect()
+    window.removeEventListener("keydown", this.onKeyDown)
+    window.removeEventListener("keyup", this.onKeyUp)
     window.removeEventListener("mousemove", this.onMouseMove)
     window.removeEventListener("mouseup", this.onMouseUp)
   },

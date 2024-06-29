@@ -11,7 +11,7 @@ const css = /* css */ `
 
   .x-node-title-bar {
     padding: 0.5em;
-    background-color: rgb(215, 215, 215);
+    background-color: rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid black;
   }
 
@@ -27,7 +27,7 @@ const css = /* css */ `
     align-content: flex-start;
     align-items: flex-start;
     border-top: 1px solid black;
-    background-color: rgb(215, 215, 215);
+    background-color: rgba(0, 0, 0, 0.1);
   }
 
   .x-node-jacks-inputs,
