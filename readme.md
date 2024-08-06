@@ -1,3 +1,7 @@
+> ⚠️ **NOTE:** ⚠️ This project is being merged into a monorepo [here](https://github.com/jrc03c/monorepo/tree/main/packages/misc-vue-components). This repo will soon be archived.
+
+---
+
 # Intro
 
 This library contains a few Vue components I've found to be useful in various projects.
